@@ -10,33 +10,339 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HisabRouteImport } from './routes/hisab'
+import { Route as HisabIndexRouteImport } from './routes/hisab.index'
+import { Route as HisabActivityRouteImport } from './routes/hisab.activity'
+import { Route as HisabCapitalRouteImport } from './routes/hisab.capital'
+import { Route as HisabCustomersRouteImport } from './routes/hisab.customers'
+import { Route as HisabFilesRouteImport } from './routes/hisab.files'
+import { Route as HisabHelpRouteImport } from './routes/hisab.help'
+import { Route as HisabListRouteImport } from './routes/hisab.list'
+import { Route as HisabLoginRouteImport } from './routes/hisab.login'
+import { Route as HisabMoreRouteImport } from './routes/hisab.more'
+import { Route as HisabNewRouteImport } from './routes/hisab.new'
+import { Route as HisabPartiesRouteImport } from './routes/hisab.parties'
+import { Route as HisabProductsRouteImport } from './routes/hisab.products'
+import { Route as HisabReportsRouteImport } from './routes/hisab.reports'
+import { Route as HisabSearchRouteImport } from './routes/hisab.search'
+import { Route as HisabSettingsRouteImport } from './routes/hisab.settings'
+import { Route as HisabStockRouteImport } from './routes/hisab.stock'
+import { Route as HisabSuppliersRouteImport } from './routes/hisab.suppliers'
+import { Route as HisabWarehouseStockRouteImport } from './routes/hisab.warehouse-stock'
+import { Route as HisabWarehousesRouteImport } from './routes/hisab.warehouses'
+import { Route as ApiHisabScanRouteImport } from './routes/api/hisab/scan'
+import { Route as HisabCustomerIdRouteImport } from './routes/hisab.customer.$id'
+import { Route as HisabInvoiceIdRouteImport } from './routes/hisab.invoice.$id'
+import { Route as HisabSupplierIdRouteImport } from './routes/hisab.supplier.$id'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HisabRoute = HisabRouteImport.update({
+  id: '/hisab',
+  path: '/hisab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HisabIndexRoute = HisabIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabActivityRoute = HisabActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabCapitalRoute = HisabCapitalRouteImport.update({
+  id: '/capital',
+  path: '/capital',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabCustomersRoute = HisabCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabFilesRoute = HisabFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabHelpRoute = HisabHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabListRoute = HisabListRouteImport.update({
+  id: '/list',
+  path: '/list',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabLoginRoute = HisabLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabMoreRoute = HisabMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabNewRoute = HisabNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabPartiesRoute = HisabPartiesRouteImport.update({
+  id: '/parties',
+  path: '/parties',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabProductsRoute = HisabProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabReportsRoute = HisabReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabSearchRoute = HisabSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabSettingsRoute = HisabSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabStockRoute = HisabStockRouteImport.update({
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabSuppliersRoute = HisabSuppliersRouteImport.update({
+  id: '/suppliers',
+  path: '/suppliers',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabWarehouseStockRoute = HisabWarehouseStockRouteImport.update({
+  id: '/warehouse-stock',
+  path: '/warehouse-stock',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabWarehousesRoute = HisabWarehousesRouteImport.update({
+  id: '/warehouses',
+  path: '/warehouses',
+  getParentRoute: () => HisabRoute,
+} as any)
+const ApiHisabScanRoute = ApiHisabScanRouteImport.update({
+  id: '/api/hisab/scan',
+  path: '/api/hisab/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HisabCustomerIdRoute = HisabCustomerIdRouteImport.update({
+  id: '/customer/$id',
+  path: '/customer/$id',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabInvoiceIdRoute = HisabInvoiceIdRouteImport.update({
+  id: '/invoice/$id',
+  path: '/invoice/$id',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabSupplierIdRoute = HisabSupplierIdRouteImport.update({
+  id: '/supplier/$id',
+  path: '/supplier/$id',
+  getParentRoute: () => HisabRoute,
+} as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/hisab': typeof HisabRouteWithChildren
+  '/hisab/activity': typeof HisabActivityRoute
+  '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/customers': typeof HisabCustomersRoute
+  '/hisab/files': typeof HisabFilesRoute
+  '/hisab/help': typeof HisabHelpRoute
+  '/hisab/list': typeof HisabListRoute
+  '/hisab/login': typeof HisabLoginRoute
+  '/hisab/more': typeof HisabMoreRoute
+  '/hisab/new': typeof HisabNewRoute
+  '/hisab/parties': typeof HisabPartiesRoute
+  '/hisab/products': typeof HisabProductsRoute
+  '/hisab/reports': typeof HisabReportsRoute
+  '/hisab/search': typeof HisabSearchRoute
+  '/hisab/settings': typeof HisabSettingsRoute
+  '/hisab/stock': typeof HisabStockRoute
+  '/hisab/suppliers': typeof HisabSuppliersRoute
+  '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
+  '/hisab/warehouses': typeof HisabWarehousesRoute
+  '/hisab/': typeof HisabIndexRoute
+  '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/hisab/customer/$id': typeof HisabCustomerIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/hisab/activity': typeof HisabActivityRoute
+  '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/customers': typeof HisabCustomersRoute
+  '/hisab/files': typeof HisabFilesRoute
+  '/hisab/help': typeof HisabHelpRoute
+  '/hisab/list': typeof HisabListRoute
+  '/hisab/login': typeof HisabLoginRoute
+  '/hisab/more': typeof HisabMoreRoute
+  '/hisab/new': typeof HisabNewRoute
+  '/hisab/parties': typeof HisabPartiesRoute
+  '/hisab/products': typeof HisabProductsRoute
+  '/hisab/reports': typeof HisabReportsRoute
+  '/hisab/search': typeof HisabSearchRoute
+  '/hisab/settings': typeof HisabSettingsRoute
+  '/hisab/stock': typeof HisabStockRoute
+  '/hisab/suppliers': typeof HisabSuppliersRoute
+  '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
+  '/hisab/warehouses': typeof HisabWarehousesRoute
+  '/hisab': typeof HisabIndexRoute
+  '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/hisab/customer/$id': typeof HisabCustomerIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/hisab': typeof HisabRouteWithChildren
+  '/hisab/activity': typeof HisabActivityRoute
+  '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/customers': typeof HisabCustomersRoute
+  '/hisab/files': typeof HisabFilesRoute
+  '/hisab/help': typeof HisabHelpRoute
+  '/hisab/list': typeof HisabListRoute
+  '/hisab/login': typeof HisabLoginRoute
+  '/hisab/more': typeof HisabMoreRoute
+  '/hisab/new': typeof HisabNewRoute
+  '/hisab/parties': typeof HisabPartiesRoute
+  '/hisab/products': typeof HisabProductsRoute
+  '/hisab/reports': typeof HisabReportsRoute
+  '/hisab/search': typeof HisabSearchRoute
+  '/hisab/settings': typeof HisabSettingsRoute
+  '/hisab/stock': typeof HisabStockRoute
+  '/hisab/suppliers': typeof HisabSuppliersRoute
+  '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
+  '/hisab/warehouses': typeof HisabWarehousesRoute
+  '/hisab/': typeof HisabIndexRoute
+  '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/hisab/customer/$id': typeof HisabCustomerIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/hisab'
+    | '/hisab/activity'
+    | '/hisab/capital'
+    | '/hisab/customers'
+    | '/hisab/files'
+    | '/hisab/help'
+    | '/hisab/list'
+    | '/hisab/login'
+    | '/hisab/more'
+    | '/hisab/new'
+    | '/hisab/parties'
+    | '/hisab/products'
+    | '/hisab/reports'
+    | '/hisab/search'
+    | '/hisab/settings'
+    | '/hisab/stock'
+    | '/hisab/suppliers'
+    | '/hisab/warehouse-stock'
+    | '/hisab/warehouses'
+    | '/hisab/'
+    | '/api/hisab/scan'
+    | '/hisab/customer/$id'
+    | '/hisab/invoice/$id'
+    | '/hisab/supplier/$id'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/hisab/activity'
+    | '/hisab/capital'
+    | '/hisab/customers'
+    | '/hisab/files'
+    | '/hisab/help'
+    | '/hisab/list'
+    | '/hisab/login'
+    | '/hisab/more'
+    | '/hisab/new'
+    | '/hisab/parties'
+    | '/hisab/products'
+    | '/hisab/reports'
+    | '/hisab/search'
+    | '/hisab/settings'
+    | '/hisab/stock'
+    | '/hisab/suppliers'
+    | '/hisab/warehouse-stock'
+    | '/hisab/warehouses'
+    | '/hisab'
+    | '/api/hisab/scan'
+    | '/hisab/customer/$id'
+    | '/hisab/invoice/$id'
+    | '/hisab/supplier/$id'
+    | '/lovable/email/queue/process'
+  id:
+    | '__root__'
+    | '/'
+    | '/hisab'
+    | '/hisab/activity'
+    | '/hisab/capital'
+    | '/hisab/customers'
+    | '/hisab/files'
+    | '/hisab/help'
+    | '/hisab/list'
+    | '/hisab/login'
+    | '/hisab/more'
+    | '/hisab/new'
+    | '/hisab/parties'
+    | '/hisab/products'
+    | '/hisab/reports'
+    | '/hisab/search'
+    | '/hisab/settings'
+    | '/hisab/stock'
+    | '/hisab/suppliers'
+    | '/hisab/warehouse-stock'
+    | '/hisab/warehouses'
+    | '/hisab/'
+    | '/api/hisab/scan'
+    | '/hisab/customer/$id'
+    | '/hisab/invoice/$id'
+    | '/hisab/supplier/$id'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HisabRoute: typeof HisabRouteWithChildren
+  ApiHisabScanRoute: typeof ApiHisabScanRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +354,241 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hisab': {
+      id: '/hisab'
+      path: '/hisab'
+      fullPath: '/hisab'
+      preLoaderRoute: typeof HisabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hisab/': {
+      id: '/hisab/'
+      path: '/'
+      fullPath: '/hisab/'
+      preLoaderRoute: typeof HisabIndexRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/activity': {
+      id: '/hisab/activity'
+      path: '/activity'
+      fullPath: '/hisab/activity'
+      preLoaderRoute: typeof HisabActivityRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/capital': {
+      id: '/hisab/capital'
+      path: '/capital'
+      fullPath: '/hisab/capital'
+      preLoaderRoute: typeof HisabCapitalRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/customers': {
+      id: '/hisab/customers'
+      path: '/customers'
+      fullPath: '/hisab/customers'
+      preLoaderRoute: typeof HisabCustomersRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/files': {
+      id: '/hisab/files'
+      path: '/files'
+      fullPath: '/hisab/files'
+      preLoaderRoute: typeof HisabFilesRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/help': {
+      id: '/hisab/help'
+      path: '/help'
+      fullPath: '/hisab/help'
+      preLoaderRoute: typeof HisabHelpRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/list': {
+      id: '/hisab/list'
+      path: '/list'
+      fullPath: '/hisab/list'
+      preLoaderRoute: typeof HisabListRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/login': {
+      id: '/hisab/login'
+      path: '/login'
+      fullPath: '/hisab/login'
+      preLoaderRoute: typeof HisabLoginRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/more': {
+      id: '/hisab/more'
+      path: '/more'
+      fullPath: '/hisab/more'
+      preLoaderRoute: typeof HisabMoreRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/new': {
+      id: '/hisab/new'
+      path: '/new'
+      fullPath: '/hisab/new'
+      preLoaderRoute: typeof HisabNewRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/parties': {
+      id: '/hisab/parties'
+      path: '/parties'
+      fullPath: '/hisab/parties'
+      preLoaderRoute: typeof HisabPartiesRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/products': {
+      id: '/hisab/products'
+      path: '/products'
+      fullPath: '/hisab/products'
+      preLoaderRoute: typeof HisabProductsRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/reports': {
+      id: '/hisab/reports'
+      path: '/reports'
+      fullPath: '/hisab/reports'
+      preLoaderRoute: typeof HisabReportsRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/search': {
+      id: '/hisab/search'
+      path: '/search'
+      fullPath: '/hisab/search'
+      preLoaderRoute: typeof HisabSearchRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/settings': {
+      id: '/hisab/settings'
+      path: '/settings'
+      fullPath: '/hisab/settings'
+      preLoaderRoute: typeof HisabSettingsRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/stock': {
+      id: '/hisab/stock'
+      path: '/stock'
+      fullPath: '/hisab/stock'
+      preLoaderRoute: typeof HisabStockRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/suppliers': {
+      id: '/hisab/suppliers'
+      path: '/suppliers'
+      fullPath: '/hisab/suppliers'
+      preLoaderRoute: typeof HisabSuppliersRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/warehouse-stock': {
+      id: '/hisab/warehouse-stock'
+      path: '/warehouse-stock'
+      fullPath: '/hisab/warehouse-stock'
+      preLoaderRoute: typeof HisabWarehouseStockRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/warehouses': {
+      id: '/hisab/warehouses'
+      path: '/warehouses'
+      fullPath: '/hisab/warehouses'
+      preLoaderRoute: typeof HisabWarehousesRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/api/hisab/scan': {
+      id: '/api/hisab/scan'
+      path: '/api/hisab/scan'
+      fullPath: '/api/hisab/scan'
+      preLoaderRoute: typeof ApiHisabScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hisab/customer/$id': {
+      id: '/hisab/customer/$id'
+      path: '/customer/$id'
+      fullPath: '/hisab/customer/$id'
+      preLoaderRoute: typeof HisabCustomerIdRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/invoice/$id': {
+      id: '/hisab/invoice/$id'
+      path: '/invoice/$id'
+      fullPath: '/hisab/invoice/$id'
+      preLoaderRoute: typeof HisabInvoiceIdRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/supplier/$id': {
+      id: '/hisab/supplier/$id'
+      path: '/supplier/$id'
+      fullPath: '/hisab/supplier/$id'
+      preLoaderRoute: typeof HisabSupplierIdRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface HisabRouteChildren {
+  HisabActivityRoute: typeof HisabActivityRoute
+  HisabCapitalRoute: typeof HisabCapitalRoute
+  HisabCustomersRoute: typeof HisabCustomersRoute
+  HisabFilesRoute: typeof HisabFilesRoute
+  HisabHelpRoute: typeof HisabHelpRoute
+  HisabListRoute: typeof HisabListRoute
+  HisabLoginRoute: typeof HisabLoginRoute
+  HisabMoreRoute: typeof HisabMoreRoute
+  HisabNewRoute: typeof HisabNewRoute
+  HisabPartiesRoute: typeof HisabPartiesRoute
+  HisabProductsRoute: typeof HisabProductsRoute
+  HisabReportsRoute: typeof HisabReportsRoute
+  HisabSearchRoute: typeof HisabSearchRoute
+  HisabSettingsRoute: typeof HisabSettingsRoute
+  HisabStockRoute: typeof HisabStockRoute
+  HisabSuppliersRoute: typeof HisabSuppliersRoute
+  HisabWarehouseStockRoute: typeof HisabWarehouseStockRoute
+  HisabWarehousesRoute: typeof HisabWarehousesRoute
+  HisabIndexRoute: typeof HisabIndexRoute
+  HisabCustomerIdRoute: typeof HisabCustomerIdRoute
+  HisabInvoiceIdRoute: typeof HisabInvoiceIdRoute
+  HisabSupplierIdRoute: typeof HisabSupplierIdRoute
+}
+
+const HisabRouteChildren: HisabRouteChildren = {
+  HisabActivityRoute: HisabActivityRoute,
+  HisabCapitalRoute: HisabCapitalRoute,
+  HisabCustomersRoute: HisabCustomersRoute,
+  HisabFilesRoute: HisabFilesRoute,
+  HisabHelpRoute: HisabHelpRoute,
+  HisabListRoute: HisabListRoute,
+  HisabLoginRoute: HisabLoginRoute,
+  HisabMoreRoute: HisabMoreRoute,
+  HisabNewRoute: HisabNewRoute,
+  HisabPartiesRoute: HisabPartiesRoute,
+  HisabProductsRoute: HisabProductsRoute,
+  HisabReportsRoute: HisabReportsRoute,
+  HisabSearchRoute: HisabSearchRoute,
+  HisabSettingsRoute: HisabSettingsRoute,
+  HisabStockRoute: HisabStockRoute,
+  HisabSuppliersRoute: HisabSuppliersRoute,
+  HisabWarehouseStockRoute: HisabWarehouseStockRoute,
+  HisabWarehousesRoute: HisabWarehousesRoute,
+  HisabIndexRoute: HisabIndexRoute,
+  HisabCustomerIdRoute: HisabCustomerIdRoute,
+  HisabInvoiceIdRoute: HisabInvoiceIdRoute,
+  HisabSupplierIdRoute: HisabSupplierIdRoute,
+}
+
+const HisabRouteWithChildren = HisabRoute._addFileChildren(HisabRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HisabRoute: HisabRouteWithChildren,
+  ApiHisabScanRoute: ApiHisabScanRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

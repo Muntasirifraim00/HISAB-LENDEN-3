@@ -12,4 +12,13 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // IPv6 নেই এমন পরিবেশে ডিফল্ট `::` বাইন্ড EAFNOSUPPORT দিয়ে ব্যর্থ হয়,
+    // তাই ডেভ সার্ভার সরাসরি IPv4-এ ধরা হয়।
+    server: {
+      host: "127.0.0.1",
+      port: 5173,
+      strictPort: false,
+    },
+  },
 });

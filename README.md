@@ -1,24 +1,36 @@
-# HISAB LENDEN 2.0
+# হিসাব — দোকানের খাতা ও গুদাম
 
-HELLO
+ছোট ব্যবসার জন্য বাংলা হিসাব-খাতা: ক্রয়, বিক্রয়, খরচ, FIFO স্টক, লাভ, বাকি ও
+কিস্তি, গ্রাহক-বিক্রেতা, গুদাম, ব্যবসায়িক পুঁজি ও রিপোর্ট — সব এক জায়গায়।
+মোবাইলে "হোম স্ক্রিনে যোগ করুন" দিলে অ্যাপের মতো চলে (PWA)।
 
-This project was built with [Lovable](https://lovable.dev).
+অ্যাপটি `/hisab` ঠিকানায় থাকে; মূল ঠিকানা (`/`) সেখানেই রিডাইরেক্ট করে।
 
-## Build with Lovable
+## স্ট্যাক
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a72ae717-b7ac-4b75-85ad-4564e4ce2b57).
+- React 19 + TanStack Start / Router (SSR, Cloudflare Workers)
+- Vite + Tailwind CSS 4 + shadcn/ui
+- Supabase (Postgres, Auth, Storage) — সব লেখালেখি `hb_*` RPC দিয়ে, এক ট্রানজেকশনে
+- Vitest
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## ডেভেলপমেন্ট
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+npm install
+npm run dev      # http://127.0.0.1:5173
+npm run build
+npm run test
+npm run lint
 ```
+
+## ফোল্ডার
+
+| পথ | কী আছে |
+| --- | --- |
+| `src/routes/hisab.*.tsx` | অ্যাপের পাতাগুলো (ড্যাশবোর্ড, নতুন হিসাব, তালিকা, স্টক, রিপোর্ট…) |
+| `src/routes/api/hisab/*` | সার্ভার এন্ডপয়েন্ট (রিপোর্ট, সার্চ, পুঁজি, AI স্ক্যান…) |
+| `src/lib/hisab/*` | ডেটা স্তর, টাইপ, ফরম্যাট, সেভ করার আগের পরীক্ষা |
+| `src/components/hisab/*` | অ্যাপের নিজস্ব UI অংশ |
+| `supabase/migrations/*` | টেবিল, ভিউ, RPC ও RLS |
+
+বৈশিষ্ট্যের বিস্তারিত ব্যাখ্যা: [`FEATURES.md`](./FEATURES.md)
