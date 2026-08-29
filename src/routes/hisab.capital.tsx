@@ -14,6 +14,8 @@ function CapitalPage() {
   const [initAmount, setInitAmount] = useState("");
   const [injectAmount, setInjectAmount] = useState("");
   const [injectNote, setInjectNote] = useState("");
+  const [adminPass, setAdminPass] = useState("");
+  const [adminErr, setAdminErr] = useState("");
 
   const { data: capital, isLoading: capitalLoading } = useQuery({
     queryKey: ["capital"],
