@@ -25,6 +25,19 @@ export async function hisabLogin(name: string, password: string): Promise<LoginR
     if (/already registered|User already/i.test(signUp.error.message)) {
       return { ok: false, error: "পাসওয়ার্ড মেলেনি।" };
     }
+
+    // Supabase-এ সাইনআপ বন্ধ থাকলে অ্যাকাউন্ট আপনাআপনি তৈরি হয় না। তখন
+    // অ্যাকাউন্টগুলো ডেটাবেস থেকেই বসাতে হয় — সেই মাইগ্রেশন রিপোতে আছে।
+    if (/signups? not allowed|signups? (is |are )?disabled/i.test(signUp.error.message)) {
+      return {
+        ok: false,
+        error:
+          "এই নামে অ্যাকাউন্ট নেই, আর Supabase-এ সাইনআপ বন্ধ। " +
+          "মাইগ্রেশন 20260829140000_hisab_test_logins.sql চালান, অথবা Supabase → " +
+          "Authentication → Sign In / Providers-এ সাইনআপ চালু করুন।",
+      };
+    }
+
     return { ok: false, error: signUp.error.message };
   }
 
