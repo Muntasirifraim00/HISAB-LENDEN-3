@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Search, Users } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus, Search, Users } from "lucide-react";
+import { toast } from "sonner";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 import { listParties } from "@/lib/hisab/api";
 import { bnDate, money, num } from "@/lib/hisab/format";
 import { Card, Empty, Input, Loading, SectionTitle, StatTile } from "@/components/hisab/ui";
@@ -58,6 +60,8 @@ function PartiesPage() {
           <StatTile label="মোট দেনা" value={money(totals.payable)} tone="red" sub="সরবরাহকারীদের" />
         </div>
       </Card>
+
+      <NewPartyCard />
 
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -139,5 +143,118 @@ function PartiesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+/** নতুন পার্টি (গ্রাহক বা সরবরাহকারী) সরাসরি এখান থেকেই যোগ করা যায় */
+function NewPartyCard() {
+  const qc = useQueryClient();
+  const [open, setOpen] = React.useState(false);
+  const [kind, setKind] = React.useState<"customer" | "supplier">("customer");
+  const [name, setName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [opening, setOpening] = React.useState("");
+  const [note, setNote] = React.useState("");
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const res = await hisabFetch(
+        kind === "customer" ? "/api/hisab/customers" : "/api/hisab/suppliers",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            phone: phone.trim() || null,
+            address: address.trim() || null,
+            opening_balance: opening ? Number(opening) : 0,
+            notes: note.trim() || null,
+          }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok || data?.error) throw new Error(data?.error ?? "সংরক্ষণ হয়নি");
+      return data;
+    },
+    onSuccess: () => {
+      toast.success(kind === "customer" ? "নতুন গ্রাহক যোগ হয়েছে" : "নতুন সরবরাহকারী যোগ হয়েছে");
+      qc.invalidateQueries({ queryKey: ["hisab", "parties"] });
+      qc.invalidateQueries({ queryKey: ["customers"] });
+      qc.invalidateQueries({ queryKey: ["suppliers"] });
+      setName("");
+      setPhone("");
+      setAddress("");
+      setOpening("");
+      setNote("");
+      setOpen(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white px-3 py-3 text-[13px] font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+      >
+        <Plus className="h-4 w-4" /> নতুন পার্টি যোগ করুন
+      </button>
+    );
+  }
+
+  return (
+    <Card>
+      <SectionTitle title="নতুন পার্টি" />
+      <div className="mb-2 flex gap-1.5">
+        {(
+          [
+            { value: "customer", label: "গ্রাহক" },
+            { value: "supplier", label: "সরবরাহকারী" },
+          ] as { value: "customer" | "supplier"; label: string }[]
+        ).map((k) => (
+          <button
+            key={k.value}
+            onClick={() => setKind(k.value)}
+            className={
+              kind === k.value
+                ? "rounded-full bg-blue-700 px-3 py-1.5 text-[12px] font-bold text-white"
+                : "rounded-full border border-slate-200 px-3 py-1.5 text-[12px] font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300"
+            }
+          >
+            {k.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="নাম *" />
+        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" />
+        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="ঠিকানা" />
+        <Input
+          value={opening}
+          onChange={(e) => setOpening(e.target.value)}
+          inputMode="decimal"
+          placeholder="শুরুর বকেয়া (ঐচ্ছিক)"
+        />
+        <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="মন্তব্য" />
+      </div>
+
+      <div className="mt-3 flex gap-2">
+        <button
+          disabled={!name.trim() || save.isPending}
+          onClick={() => save.mutate()}
+          className="flex-1 rounded-xl bg-[#132a6b] px-3 py-2.5 text-[13px] font-bold text-white disabled:opacity-50"
+        >
+          {save.isPending ? "সংরক্ষণ হচ্ছে..." : "সংরক্ষণ করুন"}
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          className="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-[13px] font-bold text-slate-600 dark:border-slate-700 dark:text-slate-300"
+        >
+          বাতিল
+        </button>
+      </div>
+    </Card>
   );
 }
