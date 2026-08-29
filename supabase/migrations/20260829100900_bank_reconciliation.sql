@@ -190,7 +190,9 @@ SELECT
   c.name as customer_name,
   coalesce(sum(cd.amount), 0) as total_deposited,
   coalesce(sum(du.amount_used), 0) as total_used,
-  coalesce(sum(cd.amount) - sum(du.amount_used), 0) as current_balance
+  coalesce(sum(cd.amount), 0) - coalesce(sum(du.amount_used), 0) as current_balance
+  -- জমা আছে অথচ কোনো ব্যবহার নেই — তখন sum(du.amount_used) NULL হয়ে
+  -- পুরো বিয়োগফলটাই NULL হয়ে যেত, ব্যালান্স ভুল করে ০ দেখাত।
 FROM public.customer_deposits cd
 LEFT JOIN public.customers c ON cd.customer_id = c.id
 LEFT JOIN public.deposit_usage du ON cd.id = du.deposit_id

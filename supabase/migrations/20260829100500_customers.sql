@@ -26,6 +26,13 @@ CREATE INDEX IF NOT EXISTS customers_phone_idx ON public.customers (phone);
 CREATE INDEX IF NOT EXISTS customers_type_idx ON public.customers (customer_type);
 CREATE INDEX IF NOT EXISTS customers_active_idx ON public.customers (is_active);
 
+-- ইনভয়েসে গ্রাহকের সূত্র — নিচের ভিউগুলো এই কলামের উপর দাঁড়ায়, তাই
+-- এখানেই যোগ করতে হয় (20260829100700 আবার চেষ্টা করলে নিঃশব্দে বাদ যাবে)।
+ALTER TABLE public.invoices
+  ADD COLUMN IF NOT EXISTS customer_id UUID REFERENCES public.customers(id);
+
+CREATE INDEX IF NOT EXISTS invoices_customer_idx ON public.invoices (customer_id);
+
 -- =====================================================================
 -- গ্রাহক-অনুযায়ী লেনদেন সারাংশ ভিউ
 -- =====================================================================
@@ -166,7 +173,7 @@ $$;
 -- =====================================================================
 
 CREATE OR REPLACE FUNCTION public.hb_get_customer_summary(p_customer_id UUID)
-RETURNS public.vw_customer_summary
+RETURNS SETOF public.vw_customer_summary
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public

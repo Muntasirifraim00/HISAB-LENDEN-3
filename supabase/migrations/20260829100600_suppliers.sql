@@ -28,6 +28,13 @@ CREATE INDEX IF NOT EXISTS suppliers_phone_idx ON public.suppliers (phone);
 CREATE INDEX IF NOT EXISTS suppliers_type_idx ON public.suppliers (supplier_type);
 CREATE INDEX IF NOT EXISTS suppliers_active_idx ON public.suppliers (is_active);
 
+-- ইনভয়েসে বিক্রেতার সূত্র — নিচের ভিউগুলো এই কলামের উপর দাঁড়ায়, তাই
+-- এখানেই যোগ করতে হয় (20260829100700 আবার চেষ্টা করলে নিঃশব্দে বাদ যাবে)।
+ALTER TABLE public.invoices
+  ADD COLUMN IF NOT EXISTS supplier_id UUID REFERENCES public.suppliers(id);
+
+CREATE INDEX IF NOT EXISTS invoices_supplier_idx ON public.invoices (supplier_id);
+
 -- =====================================================================
 -- বিক্রেতা-অনুযায়ী লেনদেন সারাংশ ভিউ
 -- =====================================================================
@@ -192,7 +199,7 @@ $$;
 -- =====================================================================
 
 CREATE OR REPLACE FUNCTION public.hb_get_supplier_summary(p_supplier_id UUID)
-RETURNS public.vw_supplier_summary
+RETURNS SETOF public.vw_supplier_summary
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public

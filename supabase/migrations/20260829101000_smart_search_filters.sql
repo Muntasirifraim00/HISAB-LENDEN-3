@@ -54,7 +54,7 @@ SELECT
   i.invoice_date,
   i.party_name as title,
   i.memo_no as reference,
-  i.type as category,
+  i.type::TEXT as category,   -- enum, বাকি শাখাগুলো text দেয় — UNION-এ মিলতে হবে
   i.total_amount as amount,
   i.due_amount,
   concat('চালান: ', i.party_name, ' (', i.total_amount, ')') as description,
@@ -71,12 +71,14 @@ SELECT
   c.name as title,
   c.phone as reference,
   c.customer_type as category,
-  c.total_purchase as amount,
-  c.current_due as due_amount,
-  concat('গ্রাহক: ', c.name, ' (', c.total_purchase, ')') as description,
+  cs.total_purchase as amount,
+  cs.current_due as due_amount,
+  concat('গ্রাহক: ', c.name, ' (', coalesce(cs.total_purchase, 0), ')') as description,
   c.created_at,
   c.created_by_name as creator
 FROM public.customers c
+-- total_purchase / current_due গ্রাহক টেবিলের কলাম নয়, সারাংশ ভিউয়ের
+LEFT JOIN public.vw_customer_summary cs ON cs.id = c.id
 
 UNION ALL
 
@@ -87,12 +89,13 @@ SELECT
   s.name as title,
   s.phone as reference,
   s.supplier_type as category,
-  s.total_purchase as amount,
-  s.current_payable as due_amount,
-  concat('বিক্রেতা: ', s.name, ' (', s.total_purchase, ')') as description,
+  ss.total_purchase as amount,
+  ss.current_payable as due_amount,
+  concat('বিক্রেতা: ', s.name, ' (', coalesce(ss.total_purchase, 0), ')') as description,
   s.created_at,
   s.created_by_name as creator
 FROM public.suppliers s
+LEFT JOIN public.vw_supplier_summary ss ON ss.id = s.id
 
 UNION ALL
 
@@ -101,7 +104,7 @@ SELECT
   'product' as result_type,
   current_date::DATE as invoice_date,
   p.name as title,
-  p.sku as reference,
+  NULL::TEXT as reference,   -- products টেবিলে sku কলাম নেই
   p.unit as category,
   p.sale_price as amount,
   0 as due_amount,
@@ -181,7 +184,7 @@ UNION ALL
 SELECT
   s.name,
   'supplier' as type,
-  count() as frequency
+  count(*) as frequency
 FROM public.invoices i
 JOIN public.suppliers s ON i.supplier_id = s.id
 WHERE i.invoice_date >= current_date - interval '90 days'
