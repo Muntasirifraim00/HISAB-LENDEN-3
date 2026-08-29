@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, Clock, Filter, Heart, Trash2 } from "lucide-react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/search")({
   component: SearchPage,
@@ -51,7 +52,9 @@ function SearchPage() {
     queryKey: ["search", searchQuery],
     queryFn: async () => {
       if (!searchQuery.trim()) return [];
-      const res = await fetch(`/api/hisab/search?action=global&q=${encodeURIComponent(searchQuery)}`);
+      const res = await hisabFetch(
+        `/api/hisab/search?action=global&q=${encodeURIComponent(searchQuery)}`,
+      );
       return res.json() as Promise<SearchResult[]>;
     },
     enabled: searchQuery.length > 2,
@@ -60,7 +63,7 @@ function SearchPage() {
   const { data: quickFilters = [] } = useQuery({
     queryKey: ["quick-filters"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/search?action=quick-filters");
+      const res = await hisabFetch("/api/hisab/search?action=quick-filters");
       return res.json() as Promise<QuickFilter[]>;
     },
   });
@@ -68,7 +71,7 @@ function SearchPage() {
   const { data: suggestions = [] } = useQuery({
     queryKey: ["search-suggestions"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/search?action=suggestions");
+      const res = await hisabFetch("/api/hisab/search?action=suggestions");
       return res.json() as Promise<SearchSuggestion[]>;
     },
   });
@@ -76,7 +79,7 @@ function SearchPage() {
   const { data: searchHistory = [] } = useQuery({
     queryKey: ["search-history"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/search?action=history&type=global");
+      const res = await hisabFetch("/api/hisab/search?action=history&type=global");
       return res.json() as Promise<any[]>;
     },
   });
@@ -84,7 +87,7 @@ function SearchPage() {
   const { data: savedFilters = [] } = useQuery({
     queryKey: ["saved-filters"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/search?action=saved-filters&type=invoice");
+      const res = await hisabFetch("/api/hisab/search?action=saved-filters&type=invoice");
       return res.json() as Promise<SavedFilter[]>;
     },
   });

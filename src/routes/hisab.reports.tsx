@@ -7,6 +7,7 @@ import { bnDate, bnMonthName, money, num, toBn } from "@/lib/hisab/format";
 import { methodLabel, typeLabel } from "@/lib/hisab/constants";
 import { Button, Card, Loading, SectionTitle, Select, StatTile } from "@/components/hisab/ui";
 import type { Invoice } from "@/lib/hisab/types";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/reports")({
   component: ReportsPage,
@@ -63,7 +64,7 @@ function ReportsPage() {
   const productSalesQuery = useQuery({
     queryKey: ["reports", "product-sales"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/reports?type=product-sales");
+      const res = await hisabFetch("/api/hisab/reports?type=product-sales");
       return res.json() as Promise<ProductSalesReport[]>;
     },
   });
@@ -71,7 +72,7 @@ function ReportsPage() {
   const customerSalesQuery = useQuery({
     queryKey: ["reports", "customer-sales"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/reports?type=customer-sales");
+      const res = await hisabFetch("/api/hisab/reports?type=customer-sales");
       return res.json() as Promise<CustomerSalesAnalysis[]>;
     },
   });
@@ -79,7 +80,7 @@ function ReportsPage() {
   const stockValuationQuery = useQuery({
     queryKey: ["reports", "stock-valuation"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/reports?type=stock-valuation");
+      const res = await hisabFetch("/api/hisab/reports?type=stock-valuation");
       return res.json() as Promise<StockValuation[]>;
     },
   });
@@ -229,93 +230,92 @@ function ReportsPage() {
       </Card>
 
       {/* Monthly Report */}
-      {activeTab === "monthly" && (
-        query.isLoading ? (
+      {activeTab === "monthly" &&
+        (query.isLoading ? (
           <Loading />
         ) : (
           <>
             <Card>
-            <SectionTitle
-              title={`${bnMonthName(month)} ${toBn(year)}`}
-              right={
-                <span className="text-[11px] text-slate-500">{toBn(rows.length)} টি এন্ট্রি</span>
-              }
-            />
-            <div className="grid grid-cols-2 gap-2.5">
-              <StatTile label="বিক্রয়" value={money(totals.sales)} tone="blue" />
-              <StatTile label="ক্রয়" value={money(totals.purchases)} tone="green" />
-              <StatTile label="খরচ" value={money(totals.expenses)} tone="orange" />
-              <StatTile
-                label="মোট লাভ"
-                value={money(totals.profit)}
-                tone="purple"
-                sub="বিক্রয় − ক্রয়মূল্য"
+              <SectionTitle
+                title={`${bnMonthName(month)} ${toBn(year)}`}
+                right={
+                  <span className="text-[11px] text-slate-500">{toBn(rows.length)} টি এন্ট্রি</span>
+                }
               />
-            </div>
-
-            <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50 p-3 text-[13px] dark:bg-slate-800/60">
-              <Line label="বিক্রয়" value={totals.sales} />
-              <Line label="বিক্রীত মালের ক্রয়মূল্য (FIFO)" value={-totals.cogs} />
-              <Line label="মোট লাভ" value={totals.profit} bold />
-              <Line label="পরিচালন খরচ" value={-totals.expenses} />
-              <div className="border-t border-slate-200 pt-1.5 dark:border-slate-700">
-                <Line label="নিট মুনাফা" value={net} bold />
+              <div className="grid grid-cols-2 gap-2.5">
+                <StatTile label="বিক্রয়" value={money(totals.sales)} tone="blue" />
+                <StatTile label="ক্রয়" value={money(totals.purchases)} tone="green" />
+                <StatTile label="খরচ" value={money(totals.expenses)} tone="orange" />
+                <StatTile
+                  label="মোট লাভ"
+                  value={money(totals.profit)}
+                  tone="purple"
+                  sub="বিক্রয় − ক্রয়মূল্য"
+                />
               </div>
-            </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-2.5">
-              <StatTile label="আদায় হয়েছে" value={money(totals.collected)} tone="green" />
-              <StatTile label="পরিশোধ করেছি" value={money(totals.paidOut)} tone="orange" />
-              <StatTile label="মাস শেষে পাওনা" value={money(totals.receivable)} tone="blue" />
-              <StatTile label="মাস শেষে দেনা" value={money(totals.payable)} tone="red" />
-            </div>
-          </Card>
+              <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50 p-3 text-[13px] dark:bg-slate-800/60">
+                <Line label="বিক্রয়" value={totals.sales} />
+                <Line label="বিক্রীত মালের ক্রয়মূল্য (FIFO)" value={-totals.cogs} />
+                <Line label="মোট লাভ" value={totals.profit} bold />
+                <Line label="পরিচালন খরচ" value={-totals.expenses} />
+                <div className="border-t border-slate-200 pt-1.5 dark:border-slate-700">
+                  <Line label="নিট মুনাফা" value={net} bold />
+                </div>
+              </div>
 
-          <Card>
-            <SectionTitle title="এন্ট্রির তালিকা" />
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-[12px]">
-                <thead>
-                  <tr className="border-b border-slate-200 text-left text-slate-500 dark:border-slate-800">
-                    <th className="py-2 pr-2 font-semibold">তারিখ</th>
-                    <th className="py-2 pr-2 font-semibold">ধরন</th>
-                    <th className="py-2 pr-2 font-semibold">পার্টি</th>
-                    <th className="py-2 pr-2 text-right font-semibold">মোট</th>
-                    <th className="py-2 pr-2 text-right font-semibold">বাকি</th>
-                    <th className="py-2 text-right font-semibold">লাভ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {rows.map((r: Invoice) => (
-                    <tr key={r.id}>
-                      <td className="py-1.5 pr-2 whitespace-nowrap">{bnDate(r.invoice_date)}</td>
-                      <td className="py-1.5 pr-2">{typeLabel(r.type)}</td>
-                      <td className="max-w-32 truncate py-1.5 pr-2">{r.party_name ?? "—"}</td>
-                      <td className="py-1.5 pr-2 text-right font-semibold">
-                        {money(r.total_amount)}
-                      </td>
-                      <td className="py-1.5 pr-2 text-right text-rose-600">
-                        {num(r.due_amount) > 0 ? money(r.due_amount) : "—"}
-                      </td>
-                      <td className="py-1.5 text-right text-violet-600">
-                        {r.type === "sale" ? money(r.profit) : "—"}
-                      </td>
+              <div className="mt-3 grid grid-cols-2 gap-2.5">
+                <StatTile label="আদায় হয়েছে" value={money(totals.collected)} tone="green" />
+                <StatTile label="পরিশোধ করেছি" value={money(totals.paidOut)} tone="orange" />
+                <StatTile label="মাস শেষে পাওনা" value={money(totals.receivable)} tone="blue" />
+                <StatTile label="মাস শেষে দেনা" value={money(totals.payable)} tone="red" />
+              </div>
+            </Card>
+
+            <Card>
+              <SectionTitle title="এন্ট্রির তালিকা" />
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[560px] text-[12px]">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-left text-slate-500 dark:border-slate-800">
+                      <th className="py-2 pr-2 font-semibold">তারিখ</th>
+                      <th className="py-2 pr-2 font-semibold">ধরন</th>
+                      <th className="py-2 pr-2 font-semibold">পার্টি</th>
+                      <th className="py-2 pr-2 text-right font-semibold">মোট</th>
+                      <th className="py-2 pr-2 text-right font-semibold">বাকি</th>
+                      <th className="py-2 text-right font-semibold">লাভ</th>
                     </tr>
-                  ))}
-                  {rows.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-500">
-                        এই মাসে কোনো হিসাব নেই।
-                      </td>
-                    </tr>
-                  ) : null}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {rows.map((r: Invoice) => (
+                      <tr key={r.id}>
+                        <td className="py-1.5 pr-2 whitespace-nowrap">{bnDate(r.invoice_date)}</td>
+                        <td className="py-1.5 pr-2">{typeLabel(r.type)}</td>
+                        <td className="max-w-32 truncate py-1.5 pr-2">{r.party_name ?? "—"}</td>
+                        <td className="py-1.5 pr-2 text-right font-semibold">
+                          {money(r.total_amount)}
+                        </td>
+                        <td className="py-1.5 pr-2 text-right text-rose-600">
+                          {num(r.due_amount) > 0 ? money(r.due_amount) : "—"}
+                        </td>
+                        <td className="py-1.5 text-right text-violet-600">
+                          {r.type === "sale" ? money(r.profit) : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                    {rows.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-slate-500">
+                          এই মাসে কোনো হিসাব নেই।
+                        </td>
+                      </tr>
+                    ) : null}
+                  </tbody>
+                </table>
+              </div>
             </Card>
           </>
-        )
-      )}
+        ))}
 
       {/* Product Sales Report */}
       {activeTab === "products" && (
@@ -329,9 +329,14 @@ function ReportsPage() {
             ) : (
               <div className="space-y-2">
                 {(productSalesQuery.data ?? []).slice(0, 15).map((product) => (
-                  <div key={product.id} className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800">
+                  <div
+                    key={product.id}
+                    className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800"
+                  >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900 dark:text-slate-100">{product.product_name}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
+                        {product.product_name}
+                      </p>
                       <p className="text-xs text-slate-600 dark:text-slate-400">
                         {product.total_qty_sold} ইউনিট • {product.transaction_count} বিক্রয়
                       </p>
@@ -364,11 +369,17 @@ function ReportsPage() {
             ) : (
               <div className="space-y-2">
                 {(customerSalesQuery.data ?? []).slice(0, 10).map((customer) => (
-                  <div key={customer.customer_name} className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800">
+                  <div
+                    key={customer.customer_name}
+                    className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800"
+                  >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900 dark:text-slate-100">{customer.customer_name}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
+                        {customer.customer_name}
+                      </p>
                       <p className="text-xs text-slate-600 dark:text-slate-400">
-                        {customer.total_transactions} লেনদেন • গড় {money(customer.avg_transaction_amount)}
+                        {customer.total_transactions} লেনদেন • গড়{" "}
+                        {money(customer.avg_transaction_amount)}
                       </p>
                       {customer.days_since_last_purchase !== null && (
                         <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -406,9 +417,14 @@ function ReportsPage() {
             ) : (
               <div className="space-y-2">
                 {(stockValuationQuery.data ?? []).slice(0, 15).map((stock) => (
-                  <div key={stock.product_name} className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800">
+                  <div
+                    key={stock.product_name}
+                    className="flex items-start justify-between border-b border-slate-200 pb-2 dark:border-slate-800"
+                  >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900 dark:text-slate-100">{stock.product_name}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
+                        {stock.product_name}
+                      </p>
                       <p className="text-xs text-slate-600 dark:text-slate-400">
                         {stock.total_qty_in_stock} ইউনিট • {stock.number_of_lots} লট
                       </p>

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ChevronRight, Plus } from "lucide-react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/suppliers")({
   component: SuppliersPage,
@@ -36,14 +37,14 @@ function SuppliersPage() {
   const { data: suppliers = [], isLoading } = useQuery({
     queryKey: ["suppliers"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/suppliers");
+      const res = await hisabFetch("/api/hisab/suppliers");
       return res.json();
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await fetch("/api/hisab/suppliers", {
+      const res = await hisabFetch("/api/hisab/suppliers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingId ? { ...data, id: editingId } : data),
@@ -115,9 +116,7 @@ function SuppliersPage() {
     <div className="space-y-4 pb-24">
       <div className="sticky top-0 z-20 -mx-3 -mt-4 bg-white px-3 py-4 shadow-sm dark:bg-slate-950">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            বিক্রেতা
-          </h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">বিক্রেতা</h1>
           <button
             onClick={() => {
               setShowForm(!showForm);
@@ -150,9 +149,7 @@ function SuppliersPage() {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="আব্দুর রহিম কোম্পানি"
               />
@@ -165,9 +162,7 @@ function SuppliersPage() {
               <input
                 type="text"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="+880123456789"
               />
@@ -180,9 +175,7 @@ function SuppliersPage() {
               <input
                 type="text"
                 value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="ঢাকা"
               />
@@ -196,9 +189,7 @@ function SuppliersPage() {
                 <input
                   type="text"
                   value={formData.contact_person}
-                  onChange={(e) =>
-                    setFormData({ ...formData, contact_person: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
                   className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                   placeholder="নাম"
                 />
@@ -232,9 +223,7 @@ function SuppliersPage() {
               <input
                 type="text"
                 value={formData.payment_terms}
-                onChange={(e) =>
-                  setFormData({ ...formData, payment_terms: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, payment_terms: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="৩০ দিন বা নগদ"
               />
@@ -285,17 +274,13 @@ function SuppliersPage() {
                 </div>
                 <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
                   <div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      মোট ক্রয়
-                    </p>
+                    <p className="text-slate-600 dark:text-slate-400">মোট ক্রয়</p>
                     <p className="font-semibold text-slate-900 dark:text-slate-100">
                       {formatCurrency(supplier.total_purchase)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      পরিশোধিত
-                    </p>
+                    <p className="text-slate-600 dark:text-slate-400">পরিশোধিত</p>
                     <p className="font-semibold text-slate-900 dark:text-slate-100">
                       {formatCurrency(supplier.total_paid)}
                     </p>

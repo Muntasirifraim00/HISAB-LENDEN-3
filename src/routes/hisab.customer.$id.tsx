@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/customer/$id")({
   component: CustomerDetailPage,
@@ -37,7 +38,7 @@ function CustomerDetailPage() {
   const { data: customer, isLoading: customerLoading } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
-      const res = await fetch(`/api/hisab/customers?id=${id}`);
+      const res = await hisabFetch(`/api/hisab/customers?id=${id}`);
       return res.json() as Promise<Customer>;
     },
   });
@@ -45,7 +46,7 @@ function CustomerDetailPage() {
   const { data: statement = [], isLoading: statementLoading } = useQuery({
     queryKey: ["customer-statement", id],
     queryFn: async () => {
-      const res = await fetch(`/api/hisab/customers?id=${id}&action=statement`);
+      const res = await hisabFetch(`/api/hisab/customers?id=${id}&action=statement`);
       return res.json() as Promise<Transaction[]>;
     },
   });
@@ -125,18 +126,14 @@ function CustomerDetailPage() {
             )}
             {customer.address && (
               <div className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
-                  ঠিকানা
-                </span>
+                <span className="text-slate-600 dark:text-slate-400">ঠিকানা</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
                   {customer.address}
                 </span>
               </div>
             )}
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-400">
-                ক্রেডিট সীমা
-              </span>
+              <span className="text-slate-600 dark:text-slate-400">ক্রেডিট সীমা</span>
               <span className="font-medium text-slate-900 dark:text-slate-100">
                 {formatCurrency(customer.credit_limit)}
               </span>
@@ -147,17 +144,13 @@ function CustomerDetailPage() {
         {/* Summary */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              মোট ক্রয়
-            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">মোট ক্রয়</p>
             <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
               {formatCurrency(customer.total_purchase)}
             </p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              পরিশোধিত
-            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">পরিশোধিত</p>
             <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
               {formatCurrency(customer.total_paid)}
             </p>
@@ -191,9 +184,7 @@ function CustomerDetailPage() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-slate-600 dark:text-slate-400">
-                        {new Date(transaction.invoice_date).toLocaleDateString(
-                          "bn-BD"
-                        )}
+                        {new Date(transaction.invoice_date).toLocaleDateString("bn-BD")}
                       </p>
                       <p className="mt-1 font-medium text-slate-900 dark:text-slate-100">
                         {transaction.memo_no || "চালান"}
@@ -212,8 +203,7 @@ function CustomerDetailPage() {
                         {formatCurrency(transaction.total_amount)}
                       </p>
                       <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                        পরিশোধিত:{" "}
-                        {formatCurrency(transaction.paid_amount)}
+                        পরিশোধিত: {formatCurrency(transaction.paid_amount)}
                       </p>
                       <p
                         className={`mt-1 text-xs font-medium ${
@@ -222,8 +212,7 @@ function CustomerDetailPage() {
                             : "text-green-600 dark:text-green-400"
                         }`}
                       >
-                        বকেয়া:{" "}
-                        {formatCurrency(transaction.due_amount)}
+                        বকেয়া: {formatCurrency(transaction.due_amount)}
                       </p>
                     </div>
                   </div>

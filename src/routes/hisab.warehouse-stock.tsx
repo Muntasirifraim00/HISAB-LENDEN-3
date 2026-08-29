@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/warehouse-stock")({
   component: WarehouseStockPage,
@@ -12,7 +13,7 @@ function WarehouseStockPage() {
   const { data: warehouses = [] } = useQuery({
     queryKey: ["warehouses"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/warehouses");
+      const res = await hisabFetch("/api/hisab/warehouses");
       return res.json();
     },
   });
@@ -44,7 +45,7 @@ function WarehouseStockPage() {
       acc[item.warehouse_name].push(item);
       return acc;
     },
-    {} as Record<string, any[]>
+    {} as Record<string, any[]>,
   );
 
   return (
@@ -106,9 +107,7 @@ function WarehouseStockPage() {
                           className="border-b border-stroke hover:bg-bg-secondary"
                         >
                           <td className="px-4 py-2 text-ink">{item.product_name}</td>
-                          <td className="px-4 py-2 text-right text-dim">
-                            {item.unit}
-                          </td>
+                          <td className="px-4 py-2 text-right text-dim">{item.unit}</td>
                           <td className="px-4 py-2 text-right font-medium text-ink">
                             {item.qty_in_stock}
                           </td>
@@ -116,9 +115,7 @@ function WarehouseStockPage() {
                             {formatCurrency(item.sale_price || 0)}
                           </td>
                           <td className="px-4 py-2 text-right font-semibold text-ink">
-                            {formatCurrency(
-                              (item.qty_in_stock || 0) * (item.sale_price || 0)
-                            )}
+                            {formatCurrency((item.qty_in_stock || 0) * (item.sale_price || 0))}
                           </td>
                         </tr>
                       ))}
@@ -134,11 +131,9 @@ function WarehouseStockPage() {
                       (items as any[])
                         .filter((item) => item.qty_in_stock > 0)
                         .reduce(
-                          (sum, item) =>
-                            sum +
-                            (item.qty_in_stock || 0) * (item.sale_price || 0),
-                          0
-                        )
+                          (sum, item) => sum + (item.qty_in_stock || 0) * (item.sale_price || 0),
+                          0,
+                        ),
                     )}
                   </span>
                 </p>

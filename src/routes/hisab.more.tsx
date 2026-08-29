@@ -28,7 +28,12 @@ const LINKS = [
     hint: "দর, একক, লো-স্টক সীমা, ওপেনিং স্টক",
     icon: Package,
   },
-  { to: "/hisab/customers", label: "গ্রাহক", hint: "বিক্রয়, ক্রেডিট লিমিট, পাওনা", icon: UserCheck },
+  {
+    to: "/hisab/customers",
+    label: "গ্রাহক",
+    hint: "বিক্রয়, ক্রেডিট লিমিট, পাওনা",
+    icon: UserCheck,
+  },
   { to: "/hisab/suppliers", label: "বিক্রেতা", hint: "ক্রয়, পেমেন্ট শর্ত, বকেয়া", icon: Truck },
   { to: "/hisab/parties", label: "পার্টি", hint: "কার কাছে কত পাওনা, কাকে কত দেনা", icon: Users },
   {

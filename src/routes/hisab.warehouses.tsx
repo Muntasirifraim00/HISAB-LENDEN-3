@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/warehouses")({
   component: WarehousesPage,
@@ -20,14 +21,14 @@ function WarehousesPage() {
   const { data: warehouses = [], isLoading } = useQuery({
     queryKey: ["warehouses"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/warehouses");
+      const res = await hisabFetch("/api/hisab/warehouses");
       return res.json();
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await fetch("/api/hisab/warehouses", {
+      const res = await hisabFetch("/api/hisab/warehouses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingId ? { ...data, id: editingId } : data),
@@ -83,29 +84,21 @@ function WarehousesPage() {
         <div className="space-y-4 rounded-lg border border-stroke bg-bg-secondary p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink">
-                গুদামের নাম *
-              </label>
+              <label className="block text-sm font-medium text-ink">গুদামের নাম *</label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="mt-1 w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
                 placeholder="যেমন: মেইন স্টোর, ব্রাঞ্চ ১"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink">
-                বর্ণনা
-              </label>
+              <label className="block text-sm font-medium text-ink">বর্ণনা</label>
               <textarea
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="mt-1 w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
                 placeholder="গুদামের বিবরণ"
                 rows={2}
@@ -113,15 +106,11 @@ function WarehousesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink">
-                অবস্থান
-              </label>
+              <label className="block text-sm font-medium text-ink">অবস্থান</label>
               <input
                 type="text"
                 value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 className="mt-1 w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
                 placeholder="যেমন: ঢাকা, গাইবান্ধা"
               />
@@ -163,9 +152,7 @@ function WarehousesPage() {
             >
               <div>
                 <h3 className="font-semibold text-ink">{warehouse.name}</h3>
-                {warehouse.location && (
-                  <p className="text-sm text-dim">{warehouse.location}</p>
-                )}
+                {warehouse.location && <p className="text-sm text-dim">{warehouse.location}</p>}
                 {warehouse.description && (
                   <p className="text-xs text-dim">{warehouse.description}</p>
                 )}

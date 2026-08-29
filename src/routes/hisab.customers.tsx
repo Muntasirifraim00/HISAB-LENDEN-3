@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ChevronRight, Plus } from "lucide-react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/customers")({
   component: CustomersPage,
@@ -35,14 +36,14 @@ function CustomersPage() {
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/customers");
+      const res = await hisabFetch("/api/hisab/customers");
       return res.json();
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await fetch("/api/hisab/customers", {
+      const res = await hisabFetch("/api/hisab/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingId ? { ...data, id: editingId } : data),
@@ -102,9 +103,7 @@ function CustomersPage() {
     <div className="space-y-4 pb-24">
       <div className="sticky top-0 z-20 -mx-3 -mt-4 bg-white px-3 py-4 shadow-sm dark:bg-slate-950">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            গ্রাহক
-          </h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">গ্রাহক</h1>
           <button
             onClick={() => {
               setShowForm(!showForm);
@@ -136,9 +135,7 @@ function CustomersPage() {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="রহিম সাহেব"
               />
@@ -151,9 +148,7 @@ function CustomersPage() {
               <input
                 type="text"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="+880123456789"
               />
@@ -166,9 +161,7 @@ function CustomersPage() {
               <input
                 type="text"
                 value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="ঢাকা"
               />
@@ -182,9 +175,7 @@ function CustomersPage() {
                 <input
                   type="number"
                   value={formData.credit_limit}
-                  onChange={(e) =>
-                    setFormData({ ...formData, credit_limit: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, credit_limit: e.target.value })}
                   className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                   placeholder="0"
                 />
@@ -262,17 +253,13 @@ function CustomersPage() {
                 </div>
                 <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
                   <div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      মোট ক্রয়
-                    </p>
+                    <p className="text-slate-600 dark:text-slate-400">মোট ক্রয়</p>
                     <p className="font-semibold text-slate-900 dark:text-slate-100">
                       {formatCurrency(customer.total_purchase)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      পরিশোধিত
-                    </p>
+                    <p className="text-slate-600 dark:text-slate-400">পরিশোধিত</p>
                     <p className="font-semibold text-slate-900 dark:text-slate-100">
                       {formatCurrency(customer.total_paid)}
                     </p>

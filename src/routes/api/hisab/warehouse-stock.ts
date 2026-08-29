@@ -1,26 +1,29 @@
-import { json, type APIEvent } from "@tanstack/start";
-import { createClient } from "@supabase/supabase-js";
+import { createFileRoute } from "@tanstack/react-router";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || "",
-  import.meta.env.VITE_SUPABASE_ANON_KEY || ""
-);
+import { json, supabaseForRequest } from "@/lib/hisab/server";
 
-export async function GET(event: APIEvent) {
-  const url = new URL(event.request.url);
-  const warehouseId = url.searchParams.get("warehouse_id");
+export const Route = createFileRoute("/api/hisab/warehouse-stock")({
+  server: {
+    handlers: {
+      GET: async ({ request }: { request: Request }) => {
+        const supabase = supabaseForRequest(request);
+        const url = new URL(request.url);
+        const warehouseId = url.searchParams.get("warehouse_id");
 
-  let query = supabase.from("vw_warehouse_stock").select("*");
+        let query = supabase.from("vw_warehouse_stock").select("*");
 
-  if (warehouseId) {
-    query = query.eq("warehouse_id", warehouseId);
-  }
+        if (warehouseId) {
+          query = query.eq("warehouse_id", warehouseId);
+        }
 
-  const { data, error } = await query.order("warehouse_name").order("product_name");
+        const { data, error } = await query.order("warehouse_name").order("product_name");
 
-  if (error) {
-    return json({ error: error.message }, { status: 400 });
-  }
+        if (error) {
+          return json({ error: error.message }, { status: 400 });
+        }
 
-  return json(data);
-}
+        return json(data);
+      },
+    },
+  },
+});

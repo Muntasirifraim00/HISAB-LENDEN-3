@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/settings")({
   component: SettingsPage,
@@ -43,7 +44,7 @@ function SettingsPage() {
   const { data: bankAccounts = [] } = useQuery({
     queryKey: ["bank-accounts"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/bank-reconciliation?action=accounts");
+      const res = await hisabFetch("/api/hisab/bank-reconciliation?action=accounts");
       return res.json() as Promise<BankAccount[]>;
     },
   });
@@ -51,7 +52,7 @@ function SettingsPage() {
   const { data: discounts = [] } = useQuery({
     queryKey: ["discounts"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/discounts-alerts?action=discounts");
+      const res = await hisabFetch("/api/hisab/discounts-alerts?action=discounts");
       return res.json() as Promise<ProductDiscount[]>;
     },
   });
@@ -59,7 +60,7 @@ function SettingsPage() {
   const { data: customerDeposits = [] } = useQuery({
     queryKey: ["customer-deposits"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/customer-deposits");
+      const res = await hisabFetch("/api/hisab/customer-deposits");
       return res.json() as Promise<CustomerDeposit[]>;
     },
   });
@@ -255,7 +256,7 @@ function BankAccountForm({ onSuccess }: { onSuccess: () => void }) {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/hisab/bank-reconciliation", {
+      const res = await hisabFetch("/api/hisab/bank-reconciliation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

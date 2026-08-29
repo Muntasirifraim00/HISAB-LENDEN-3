@@ -1,35 +1,39 @@
-import { json, type APIEvent } from "@tanstack/start";
-import { createClient } from "@supabase/supabase-js";
+import { createFileRoute } from "@tanstack/react-router";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || "",
-  import.meta.env.VITE_SUPABASE_ANON_KEY || ""
-);
+import { json, supabaseForRequest } from "@/lib/hisab/server";
 
-export async function GET(event: APIEvent) {
-  const { data, error } = await supabase
-    .from("warehouses")
-    .select("*")
-    .eq("is_active", true)
-    .order("name");
+export const Route = createFileRoute("/api/hisab/warehouses")({
+  server: {
+    handlers: {
+      GET: async ({ request }: { request: Request }) => {
+        const supabase = supabaseForRequest(request);
+        const { data, error } = await supabase
+          .from("warehouses")
+          .select("*")
+          .eq("is_active", true)
+          .order("name");
 
-  if (error) {
-    return json({ error: error.message }, { status: 400 });
-  }
+        if (error) {
+          return json({ error: error.message }, { status: 400 });
+        }
 
-  return json(data);
-}
+        return json(data);
+      },
 
-export async function POST(event: APIEvent) {
-  const body = await event.request.json();
+      POST: async ({ request }: { request: Request }) => {
+        const supabase = supabaseForRequest(request);
+        const body = await request.json();
 
-  const { data, error } = await supabase.rpc("hb_save_warehouse", {
-    p: body,
-  });
+        const { data, error } = await supabase.rpc("hb_save_warehouse", {
+          p: body,
+        });
 
-  if (error) {
-    return json({ error: error.message }, { status: 400 });
-  }
+        if (error) {
+          return json({ error: error.message }, { status: 400 });
+        }
 
-  return json(data);
-}
+        return json(data);
+      },
+    },
+  },
+});

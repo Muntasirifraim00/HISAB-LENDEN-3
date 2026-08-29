@@ -30,7 +30,18 @@ import { Route as HisabStockRouteImport } from './routes/hisab.stock'
 import { Route as HisabSuppliersRouteImport } from './routes/hisab.suppliers'
 import { Route as HisabWarehouseStockRouteImport } from './routes/hisab.warehouse-stock'
 import { Route as HisabWarehousesRouteImport } from './routes/hisab.warehouses'
+import { Route as ApiHisabAdvancePaymentsRouteImport } from './routes/api/hisab/advance-payments'
+import { Route as ApiHisabBankReconciliationRouteImport } from './routes/api/hisab/bank-reconciliation'
+import { Route as ApiHisabCapitalRouteImport } from './routes/api/hisab/capital'
+import { Route as ApiHisabCustomerDepositsRouteImport } from './routes/api/hisab/customer-deposits'
+import { Route as ApiHisabCustomersRouteImport } from './routes/api/hisab/customers'
+import { Route as ApiHisabDiscountsAlertsRouteImport } from './routes/api/hisab/discounts-alerts'
+import { Route as ApiHisabReportsRouteImport } from './routes/api/hisab/reports'
 import { Route as ApiHisabScanRouteImport } from './routes/api/hisab/scan'
+import { Route as ApiHisabSearchRouteImport } from './routes/api/hisab/search'
+import { Route as ApiHisabSuppliersRouteImport } from './routes/api/hisab/suppliers'
+import { Route as ApiHisabWarehouseStockRouteImport } from './routes/api/hisab/warehouse-stock'
+import { Route as ApiHisabWarehousesRouteImport } from './routes/api/hisab/warehouses'
 import { Route as HisabCustomerIdRouteImport } from './routes/hisab.customer.$id'
 import { Route as HisabInvoiceIdRouteImport } from './routes/hisab.invoice.$id'
 import { Route as HisabSupplierIdRouteImport } from './routes/hisab.supplier.$id'
@@ -141,9 +152,66 @@ const HisabWarehousesRoute = HisabWarehousesRouteImport.update({
   path: '/warehouses',
   getParentRoute: () => HisabRoute,
 } as any)
+const ApiHisabAdvancePaymentsRoute = ApiHisabAdvancePaymentsRouteImport.update({
+  id: '/api/hisab/advance-payments',
+  path: '/api/hisab/advance-payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabBankReconciliationRoute =
+  ApiHisabBankReconciliationRouteImport.update({
+    id: '/api/hisab/bank-reconciliation',
+    path: '/api/hisab/bank-reconciliation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiHisabCapitalRoute = ApiHisabCapitalRouteImport.update({
+  id: '/api/hisab/capital',
+  path: '/api/hisab/capital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabCustomerDepositsRoute =
+  ApiHisabCustomerDepositsRouteImport.update({
+    id: '/api/hisab/customer-deposits',
+    path: '/api/hisab/customer-deposits',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiHisabCustomersRoute = ApiHisabCustomersRouteImport.update({
+  id: '/api/hisab/customers',
+  path: '/api/hisab/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabDiscountsAlertsRoute = ApiHisabDiscountsAlertsRouteImport.update({
+  id: '/api/hisab/discounts-alerts',
+  path: '/api/hisab/discounts-alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabReportsRoute = ApiHisabReportsRouteImport.update({
+  id: '/api/hisab/reports',
+  path: '/api/hisab/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiHisabScanRoute = ApiHisabScanRouteImport.update({
   id: '/api/hisab/scan',
   path: '/api/hisab/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabSearchRoute = ApiHisabSearchRouteImport.update({
+  id: '/api/hisab/search',
+  path: '/api/hisab/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabSuppliersRoute = ApiHisabSuppliersRouteImport.update({
+  id: '/api/hisab/suppliers',
+  path: '/api/hisab/suppliers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabWarehouseStockRoute = ApiHisabWarehouseStockRouteImport.update({
+  id: '/api/hisab/warehouse-stock',
+  path: '/api/hisab/warehouse-stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHisabWarehousesRoute = ApiHisabWarehousesRouteImport.update({
+  id: '/api/hisab/warehouses',
+  path: '/api/hisab/warehouses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HisabCustomerIdRoute = HisabCustomerIdRouteImport.update({
@@ -190,7 +258,18 @@ export interface FileRoutesByFullPath {
   '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
   '/hisab/warehouses': typeof HisabWarehousesRoute
   '/hisab/': typeof HisabIndexRoute
+  '/api/hisab/advance-payments': typeof ApiHisabAdvancePaymentsRoute
+  '/api/hisab/bank-reconciliation': typeof ApiHisabBankReconciliationRoute
+  '/api/hisab/capital': typeof ApiHisabCapitalRoute
+  '/api/hisab/customer-deposits': typeof ApiHisabCustomerDepositsRoute
+  '/api/hisab/customers': typeof ApiHisabCustomersRoute
+  '/api/hisab/discounts-alerts': typeof ApiHisabDiscountsAlertsRoute
+  '/api/hisab/reports': typeof ApiHisabReportsRoute
   '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/api/hisab/search': typeof ApiHisabSearchRoute
+  '/api/hisab/suppliers': typeof ApiHisabSuppliersRoute
+  '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
+  '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
@@ -217,7 +296,18 @@ export interface FileRoutesByTo {
   '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
   '/hisab/warehouses': typeof HisabWarehousesRoute
   '/hisab': typeof HisabIndexRoute
+  '/api/hisab/advance-payments': typeof ApiHisabAdvancePaymentsRoute
+  '/api/hisab/bank-reconciliation': typeof ApiHisabBankReconciliationRoute
+  '/api/hisab/capital': typeof ApiHisabCapitalRoute
+  '/api/hisab/customer-deposits': typeof ApiHisabCustomerDepositsRoute
+  '/api/hisab/customers': typeof ApiHisabCustomersRoute
+  '/api/hisab/discounts-alerts': typeof ApiHisabDiscountsAlertsRoute
+  '/api/hisab/reports': typeof ApiHisabReportsRoute
   '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/api/hisab/search': typeof ApiHisabSearchRoute
+  '/api/hisab/suppliers': typeof ApiHisabSuppliersRoute
+  '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
+  '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
@@ -246,7 +336,18 @@ export interface FileRoutesById {
   '/hisab/warehouse-stock': typeof HisabWarehouseStockRoute
   '/hisab/warehouses': typeof HisabWarehousesRoute
   '/hisab/': typeof HisabIndexRoute
+  '/api/hisab/advance-payments': typeof ApiHisabAdvancePaymentsRoute
+  '/api/hisab/bank-reconciliation': typeof ApiHisabBankReconciliationRoute
+  '/api/hisab/capital': typeof ApiHisabCapitalRoute
+  '/api/hisab/customer-deposits': typeof ApiHisabCustomerDepositsRoute
+  '/api/hisab/customers': typeof ApiHisabCustomersRoute
+  '/api/hisab/discounts-alerts': typeof ApiHisabDiscountsAlertsRoute
+  '/api/hisab/reports': typeof ApiHisabReportsRoute
   '/api/hisab/scan': typeof ApiHisabScanRoute
+  '/api/hisab/search': typeof ApiHisabSearchRoute
+  '/api/hisab/suppliers': typeof ApiHisabSuppliersRoute
+  '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
+  '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
@@ -276,7 +377,18 @@ export interface FileRouteTypes {
     | '/hisab/warehouse-stock'
     | '/hisab/warehouses'
     | '/hisab/'
+    | '/api/hisab/advance-payments'
+    | '/api/hisab/bank-reconciliation'
+    | '/api/hisab/capital'
+    | '/api/hisab/customer-deposits'
+    | '/api/hisab/customers'
+    | '/api/hisab/discounts-alerts'
+    | '/api/hisab/reports'
     | '/api/hisab/scan'
+    | '/api/hisab/search'
+    | '/api/hisab/suppliers'
+    | '/api/hisab/warehouse-stock'
+    | '/api/hisab/warehouses'
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
@@ -303,7 +415,18 @@ export interface FileRouteTypes {
     | '/hisab/warehouse-stock'
     | '/hisab/warehouses'
     | '/hisab'
+    | '/api/hisab/advance-payments'
+    | '/api/hisab/bank-reconciliation'
+    | '/api/hisab/capital'
+    | '/api/hisab/customer-deposits'
+    | '/api/hisab/customers'
+    | '/api/hisab/discounts-alerts'
+    | '/api/hisab/reports'
     | '/api/hisab/scan'
+    | '/api/hisab/search'
+    | '/api/hisab/suppliers'
+    | '/api/hisab/warehouse-stock'
+    | '/api/hisab/warehouses'
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
@@ -331,7 +454,18 @@ export interface FileRouteTypes {
     | '/hisab/warehouse-stock'
     | '/hisab/warehouses'
     | '/hisab/'
+    | '/api/hisab/advance-payments'
+    | '/api/hisab/bank-reconciliation'
+    | '/api/hisab/capital'
+    | '/api/hisab/customer-deposits'
+    | '/api/hisab/customers'
+    | '/api/hisab/discounts-alerts'
+    | '/api/hisab/reports'
     | '/api/hisab/scan'
+    | '/api/hisab/search'
+    | '/api/hisab/suppliers'
+    | '/api/hisab/warehouse-stock'
+    | '/api/hisab/warehouses'
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
@@ -341,7 +475,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HisabRoute: typeof HisabRouteWithChildren
+  ApiHisabAdvancePaymentsRoute: typeof ApiHisabAdvancePaymentsRoute
+  ApiHisabBankReconciliationRoute: typeof ApiHisabBankReconciliationRoute
+  ApiHisabCapitalRoute: typeof ApiHisabCapitalRoute
+  ApiHisabCustomerDepositsRoute: typeof ApiHisabCustomerDepositsRoute
+  ApiHisabCustomersRoute: typeof ApiHisabCustomersRoute
+  ApiHisabDiscountsAlertsRoute: typeof ApiHisabDiscountsAlertsRoute
+  ApiHisabReportsRoute: typeof ApiHisabReportsRoute
   ApiHisabScanRoute: typeof ApiHisabScanRoute
+  ApiHisabSearchRoute: typeof ApiHisabSearchRoute
+  ApiHisabSuppliersRoute: typeof ApiHisabSuppliersRoute
+  ApiHisabWarehouseStockRoute: typeof ApiHisabWarehouseStockRoute
+  ApiHisabWarehousesRoute: typeof ApiHisabWarehousesRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -494,11 +639,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HisabWarehousesRouteImport
       parentRoute: typeof HisabRoute
     }
+    '/api/hisab/advance-payments': {
+      id: '/api/hisab/advance-payments'
+      path: '/api/hisab/advance-payments'
+      fullPath: '/api/hisab/advance-payments'
+      preLoaderRoute: typeof ApiHisabAdvancePaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/bank-reconciliation': {
+      id: '/api/hisab/bank-reconciliation'
+      path: '/api/hisab/bank-reconciliation'
+      fullPath: '/api/hisab/bank-reconciliation'
+      preLoaderRoute: typeof ApiHisabBankReconciliationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/capital': {
+      id: '/api/hisab/capital'
+      path: '/api/hisab/capital'
+      fullPath: '/api/hisab/capital'
+      preLoaderRoute: typeof ApiHisabCapitalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/customer-deposits': {
+      id: '/api/hisab/customer-deposits'
+      path: '/api/hisab/customer-deposits'
+      fullPath: '/api/hisab/customer-deposits'
+      preLoaderRoute: typeof ApiHisabCustomerDepositsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/customers': {
+      id: '/api/hisab/customers'
+      path: '/api/hisab/customers'
+      fullPath: '/api/hisab/customers'
+      preLoaderRoute: typeof ApiHisabCustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/discounts-alerts': {
+      id: '/api/hisab/discounts-alerts'
+      path: '/api/hisab/discounts-alerts'
+      fullPath: '/api/hisab/discounts-alerts'
+      preLoaderRoute: typeof ApiHisabDiscountsAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/reports': {
+      id: '/api/hisab/reports'
+      path: '/api/hisab/reports'
+      fullPath: '/api/hisab/reports'
+      preLoaderRoute: typeof ApiHisabReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/hisab/scan': {
       id: '/api/hisab/scan'
       path: '/api/hisab/scan'
       fullPath: '/api/hisab/scan'
       preLoaderRoute: typeof ApiHisabScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/search': {
+      id: '/api/hisab/search'
+      path: '/api/hisab/search'
+      fullPath: '/api/hisab/search'
+      preLoaderRoute: typeof ApiHisabSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/suppliers': {
+      id: '/api/hisab/suppliers'
+      path: '/api/hisab/suppliers'
+      fullPath: '/api/hisab/suppliers'
+      preLoaderRoute: typeof ApiHisabSuppliersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/warehouse-stock': {
+      id: '/api/hisab/warehouse-stock'
+      path: '/api/hisab/warehouse-stock'
+      fullPath: '/api/hisab/warehouse-stock'
+      preLoaderRoute: typeof ApiHisabWarehouseStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hisab/warehouses': {
+      id: '/api/hisab/warehouses'
+      path: '/api/hisab/warehouses'
+      fullPath: '/api/hisab/warehouses'
+      preLoaderRoute: typeof ApiHisabWarehousesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hisab/customer/$id': {
@@ -587,7 +809,18 @@ const HisabRouteWithChildren = HisabRoute._addFileChildren(HisabRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HisabRoute: HisabRouteWithChildren,
+  ApiHisabAdvancePaymentsRoute: ApiHisabAdvancePaymentsRoute,
+  ApiHisabBankReconciliationRoute: ApiHisabBankReconciliationRoute,
+  ApiHisabCapitalRoute: ApiHisabCapitalRoute,
+  ApiHisabCustomerDepositsRoute: ApiHisabCustomerDepositsRoute,
+  ApiHisabCustomersRoute: ApiHisabCustomersRoute,
+  ApiHisabDiscountsAlertsRoute: ApiHisabDiscountsAlertsRoute,
+  ApiHisabReportsRoute: ApiHisabReportsRoute,
   ApiHisabScanRoute: ApiHisabScanRoute,
+  ApiHisabSearchRoute: ApiHisabSearchRoute,
+  ApiHisabSuppliersRoute: ApiHisabSuppliersRoute,
+  ApiHisabWarehouseStockRoute: ApiHisabWarehouseStockRoute,
+  ApiHisabWarehousesRoute: ApiHisabWarehousesRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport

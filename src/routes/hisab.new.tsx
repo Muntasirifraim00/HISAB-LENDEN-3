@@ -37,6 +37,7 @@ import {
   Textarea,
 } from "@/components/hisab/ui";
 import { Autocomplete } from "@/components/hisab/autocomplete";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/new")({
   validateSearch: (search: Record<string, unknown>): { type?: InvoiceType } =>
@@ -126,7 +127,7 @@ function CustomerSelector({ value, onChange }: { value: string; onChange: (id: s
       onChange={onChange}
       queryKey={["customers"]}
       fetchItems={async () => {
-        const res = await fetch("/api/hisab/customers");
+        const res = await hisabFetch("/api/hisab/customers");
         const customers: Customer[] = await res.json();
         return customers.map((c) => ({ id: c.id, name: c.name }));
       }}
@@ -143,7 +144,7 @@ function SupplierSelector({ value, onChange }: { value: string; onChange: (id: s
       onChange={onChange}
       queryKey={["suppliers"]}
       fetchItems={async () => {
-        const res = await fetch("/api/hisab/suppliers");
+        const res = await hisabFetch("/api/hisab/suppliers");
         const suppliers: Supplier[] = await res.json();
         return suppliers.map((s) => ({ id: s.id, name: s.name }));
       }}
@@ -231,7 +232,7 @@ function NewEntry() {
     setScanning(true);
     setError(null);
     try {
-      const res = await fetch("/api/hisab/scan", {
+      const res = await hisabFetch("/api/hisab/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imageDataUrl, type: form.type }),

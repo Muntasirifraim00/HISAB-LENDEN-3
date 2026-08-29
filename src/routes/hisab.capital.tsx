@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { hisabFetch } from "@/lib/hisab/apiFetch";
 
 export const Route = createFileRoute("/hisab/capital")({
   component: CapitalPage,
@@ -17,7 +18,7 @@ function CapitalPage() {
   const { data: capital, isLoading: capitalLoading } = useQuery({
     queryKey: ["capital"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/capital?action=capital");
+      const res = await hisabFetch("/api/hisab/capital?action=capital");
       const data = await res.json();
       return data.error ? null : data;
     },
@@ -26,7 +27,7 @@ function CapitalPage() {
   const { data: summary = {} } = useQuery({
     queryKey: ["business-summary"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/capital?action=summary");
+      const res = await hisabFetch("/api/hisab/capital?action=summary");
       return res.json();
     },
   });
@@ -34,14 +35,14 @@ function CapitalPage() {
   const { data: injections = [] } = useQuery({
     queryKey: ["capital-injections"],
     queryFn: async () => {
-      const res = await fetch("/api/hisab/capital?action=injections");
+      const res = await hisabFetch("/api/hisab/capital?action=injections");
       return res.json();
     },
   });
 
   const initMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/hisab/capital", {
+      const res = await hisabFetch("/api/hisab/capital", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "init", amount: parseFloat(initAmount) }),
@@ -59,7 +60,7 @@ function CapitalPage() {
 
   const injectMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/hisab/capital", {
+      const res = await hisabFetch("/api/hisab/capital", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,9 +111,7 @@ function CapitalPage() {
 
       {!capital ? (
         <div className="space-y-4 rounded-lg border-2 border-dashed border-warning bg-warning/10 p-6">
-          <p className="text-center text-ink">
-            প্রথমে আপনার ব্যবসায়িক পুঁজি সেট করুন
-          </p>
+          <p className="text-center text-ink">প্রথমে আপনার ব্যবসায়িক পুঁজি সেট করুন</p>
           {showInitForm ? (
             <form onSubmit={handleInitSubmit} className="space-y-3">
               <input
@@ -254,13 +253,9 @@ function CapitalPage() {
                     className="flex items-center justify-between rounded-lg border border-stroke bg-bg-secondary p-3"
                   >
                     <div>
-                      <p className="font-medium text-ink">
-                        {formatCurrency(injection.amount)}
-                      </p>
+                      <p className="font-medium text-ink">{formatCurrency(injection.amount)}</p>
                       <p className="text-xs text-dim">{injection.injected_on}</p>
-                      {injection.note && (
-                        <p className="text-xs text-dim">{injection.note}</p>
-                      )}
+                      {injection.note && <p className="text-xs text-dim">{injection.note}</p>}
                     </div>
                   </div>
                 ))}
