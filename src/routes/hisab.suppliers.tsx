@@ -261,7 +261,8 @@ function SuppliersPage() {
           suppliers.map((supplier: Supplier) => (
             <Link
               key={supplier.id}
-              to={`/hisab/supplier/${supplier.id}`}
+              to="/hisab/supplier/$id"
+              params={{ id: supplier.id }}
               className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
             >
               <div className="min-w-0 flex-1">
