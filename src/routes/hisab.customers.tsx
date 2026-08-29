@@ -234,7 +234,8 @@ function CustomersPage() {
           customers.map((customer: Customer) => (
             <Link
               key={customer.id}
-              to={`/hisab/customer/${customer.id}`}
+              to="/hisab/customer/$id"
+              params={{ id: customer.id }}
               className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
             >
               <div className="min-w-0 flex-1">

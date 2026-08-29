@@ -38,7 +38,10 @@ export function HisabSessionProvider({ children }: { children: React.ReactNode }
 
   React.useEffect(() => {
     setName(currentUserName());
-    return onUserNameChange(() => setName(currentUserName()));
+    const off = onUserNameChange(() => setName(currentUserName()));
+    return () => {
+      off();
+    };
   }, []);
 
   const value = React.useMemo<SessionState>(
