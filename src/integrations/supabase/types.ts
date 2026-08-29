@@ -958,6 +958,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "vw_customer_sales_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "vw_customer_summary"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoices_reverses_invoice_id_fkey"
             columns: ["reverses_invoice_id"]
             isOneToOne: false
@@ -983,6 +1004,27 @@ export type Database = {
             columns: ["reverses_invoice_id"]
             isOneToOne: false
             referencedRelation: "vw_supplier_statement"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "vw_payable_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "vw_supplier_summary"
             referencedColumns: ["id"]
           },
           {
@@ -1974,7 +2016,29 @@ export type Database = {
           total_amount: number | null
           type: Database["public"]["Enums"]["hb_invoice_type"] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "vw_customer_sales_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "vw_customer_summary"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vw_customer_summary: {
         Row: {
@@ -2119,7 +2183,29 @@ export type Database = {
           total_amount: number | null
           type: Database["public"]["Enums"]["hb_invoice_type"] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "vw_payable_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "vw_supplier_summary"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vw_supplier_summary: {
         Row: {
@@ -2209,7 +2295,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      hb_bootstrap_exec: { Args: { p_sql: string }; Returns: string }
       hb_consume_fifo: {
         Args: { p_fallback: number; p_product_id: string; p_qty: number }
         Returns: number[]
