@@ -13,6 +13,25 @@ export const HISAB_USERS = [
 
 export type HisabUserName = (typeof HISAB_USERS)[number]["name"];
 
+/**
+ * সহজ বাধা — আসল লগইন নয়। প্রতিটি নামের নিজস্ব পাসওয়ার্ড, শুধু যাতে
+ * যে কেউ ঢুকে না পড়ে। ভবিষ্যতে আসল auth এলে এটা বাদ দেওয়া যাবে।
+ */
+export const HISAB_PASSWORDS: Record<string, string> = {
+  ISMAIL: "ismail1@",
+  KHOKA: "khoka2#",
+  MUNTSIR: "muntsir3$",
+  RUBEL: "rubel4%",
+  SHOWKOT: "showkot5&",
+  TASLIM: "taslim6*",
+};
+
+export const checkUserPassword = (name: string, pass: string) =>
+  HISAB_PASSWORDS[(name ?? "").toUpperCase()] === pass.trim();
+
+/** পুঁজিতে নতুন টাকা যোগ করার সময় লাগে */
+export const ADMIN_PASSWORD = "hisab-admin7@";
+
 /** ব্যবহারকারীর নাম → লগইন ইমেইল। সাইনআপ নেই, নাম বাছাই। */
 export const AUTH_DOMAIN = "hisab.local";
 export const emailForUser = (name: string) => `${name.toLowerCase()}@${AUTH_DOMAIN}`;
