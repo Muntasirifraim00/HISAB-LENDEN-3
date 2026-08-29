@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { hisabFetch } from "@/lib/hisab/apiFetch";
+import { ADMIN_PASSWORD } from "@/lib/hisab/constants";
 
 export const Route = createFileRoute("/hisab/capital")({
   component: CapitalPage,
@@ -81,6 +82,8 @@ function CapitalPage() {
       setShowInjectForm(false);
       setInjectAmount("");
       setInjectNote("");
+      setAdminPass("");
+      setAdminErr("");
     },
   });
 
@@ -93,6 +96,11 @@ function CapitalPage() {
   const handleInjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!injectAmount || parseFloat(injectAmount) <= 0) return;
+    if (adminPass.trim() !== ADMIN_PASSWORD) {
+      setAdminErr("অ্যাডমিন পাসওয়ার্ড মেলেনি।");
+      return;
+    }
+    setAdminErr("");
     injectMutation.mutate();
   };
 
@@ -211,6 +219,19 @@ function CapitalPage() {
                   placeholder="পুঁজি যুক্ত করুন (টাকায়)"
                   className="w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
                 />
+                <input
+                  type="password"
+                  value={adminPass}
+                  onChange={(e) => {
+                    setAdminPass(e.target.value);
+                    setAdminErr("");
+                  }}
+                  placeholder="অ্যাডমিন পাসওয়ার্ড"
+                  className="w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
+                />
+                {adminErr ? (
+                  <p className="text-sm font-semibold text-rose-600">{adminErr}</p>
+                ) : null}
                 <input
                   type="text"
                   value={injectNote}
