@@ -1,11 +1,11 @@
-import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import * as React from "react";
 import { Boxes, LayoutDashboard, ListChecks, MoreHorizontal, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { HisabSessionProvider, useHisabSession } from "@/components/hisab/session";
 import { Avatar, Spinner } from "@/components/hisab/ui";
-import { hisabLogout } from "@/lib/hisab/auth";
+import { HISAB_USERS } from "@/lib/hisab/constants";
 
 export const Route = createFileRoute("/hisab")({
   head: () => ({
@@ -46,17 +46,6 @@ function HisabLayout() {
 function Shell() {
   const { status, userName } = useHisabSession();
   const location = useLocation();
-  const navigate = useNavigate();
-  const isLogin = location.pathname.startsWith("/hisab/login");
-
-  React.useEffect(() => {
-    if (status === "out" && !isLogin) {
-      navigate({ to: "/hisab/login", replace: true });
-    }
-    if (status === "in" && isLogin) {
-      navigate({ to: "/hisab", replace: true });
-    }
-  }, [status, isLogin, navigate]);
 
   if (status === "checking") {
     return (
@@ -66,12 +55,9 @@ function Shell() {
     );
   }
 
-  if (isLogin || status === "out") {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <Outlet />
-      </div>
-    );
+  // লগইন নেই — প্রথমবার শুধু নামটা জেনে নেওয়া হয়, পাসওয়ার্ড লাগে না
+  if (status === "chooser") {
+    return <NamePicker />;
   }
 
   return (
@@ -85,8 +71,55 @@ function Shell() {
   );
 }
 
+/**
+ * প্রথমবার খোলার পর্দা — এটা লগইন নয়, পাসওয়ার্ড নেই।
+ * শুধু জেনে নেওয়া হয় এন্ট্রিগুলোতে কার নাম লেখা হবে।
+ */
+function NamePicker() {
+  const { setUserName } = useHisabSession();
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#132a6b] text-[22px] font-black text-white">
+            হি
+          </span>
+          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">হিসাব</h1>
+          <p className="mt-1 text-[13px] text-slate-500">দোকানের খাতা ও গুদাম — এক জায়গায়</p>
+        </div>
+
+        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-900">
+          <p className="text-[15px] font-bold text-slate-900 dark:text-slate-100">আপনি কে?</p>
+          <p className="mt-0.5 text-[11px] text-slate-500">
+            নামটা শুধু একবার বেছে নিন — প্রতিটা এন্ট্রিতে এটাই লেখা থাকবে।
+          </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {HISAB_USERS.map((u) => (
+              <button
+                key={u.name}
+                onClick={() => setUserName(u.name)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-[13px] font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+              >
+                <Avatar name={u.name} size={24} />
+                {u.name}
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+            পাসওয়ার্ড লাগে না। ভুল নাম বেছে ফেললে “আরও” থেকে যেকোনো সময় বদলানো যাবে।
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TopBar({ userName }: { userName: string }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const { forgetUserName } = useHisabSession();
 
   return (
     <header className="sticky top-0 z-30 bg-[#132a6b] text-white shadow-md">
@@ -135,10 +168,10 @@ function TopBar({ userName }: { userName: string }) {
               সাহায্য
             </Link>
             <button
-              onClick={() => hisabLogout()}
-              className="ml-auto rounded-lg bg-rose-500/20 px-3 py-1.5 font-semibold text-rose-100"
+              onClick={() => forgetUserName()}
+              className="ml-auto rounded-lg bg-white/10 px-3 py-1.5 font-semibold"
             >
-              লগআউট
+              নাম বদলান
             </button>
           </div>
         </div>

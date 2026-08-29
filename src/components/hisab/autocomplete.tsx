@@ -38,7 +38,7 @@ export function Autocomplete({
   const filteredItems = items.filter(
     (item) =>
       item.name.toLowerCase().includes(search.toLowerCase()) ||
-      (item.detail && item.detail.toLowerCase().includes(search.toLowerCase()))
+      (item.detail && item.detail.toLowerCase().includes(search.toLowerCase())),
   );
 
   const selectedItem = items.find((item) => item.id === value);
@@ -81,18 +81,14 @@ export function Autocomplete({
           </button>
         )}
         <ChevronDown
-          className={`h-4 w-4 text-slate-400 transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`h-4 w-4 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </div>
 
       {open && (
         <div className="absolute top-full z-10 mt-1 w-full rounded-lg border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-800">
           {filteredItems.length === 0 ? (
-            <div className="px-3 py-4 text-center text-xs text-slate-500">
-              কোনো ফলাফল নেই
-            </div>
+            <div className="px-3 py-4 text-center text-xs text-slate-500">কোনো ফলাফল নেই</div>
           ) : (
             <div className="max-h-48 overflow-y-auto">
               {filteredItems.map((item) => (
@@ -106,9 +102,7 @@ export function Autocomplete({
                     {item.name}
                   </p>
                   {item.detail && (
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      {item.detail}
-                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">{item.detail}</p>
                   )}
                 </button>
               ))}

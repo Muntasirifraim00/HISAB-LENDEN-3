@@ -1,19 +1,19 @@
 /**
  * `/api/hisab/*` এ কল করার একমাত্র উপায়।
  *
- * এন্ডপয়েন্টগুলো ব্যবহারকারীর পরিচয়েই Supabase-এ কথা বলে, তাই সেশনের টোকেনটা
- * সাথে পাঠাতে হয় — নইলে RLS সব আটকে দেয় আর পাতাগুলো খালি দেখায়।
+ * লগইন নেই, তাই কোনো টোকেন যায় না — কিন্তু "কে কাজটা করল" সেটা যেতে হয়,
+ * নইলে ডেটাবেসে এন্ট্রিগুলো "অতিথি" নামে লেখা হবে। সার্ভারের রুট এই
+ * হেডারটাই Supabase-এ পাঠিয়ে দেয়।
  *
  * সাধারণ `fetch` এর মতোই ব্যবহার করুন — উত্তরটাও `Response`।
  */
-import { supabase } from "@/integrations/supabase/client";
+import { currentUserName } from "./db";
 
 export async function hisabFetch(input: string, init: RequestInit = {}) {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-
   const headers = new Headers(init.headers);
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const name = currentUserName();
+  if (name) headers.set("x-hisab-user", name);
 
   return fetch(input, { ...init, headers });
 }

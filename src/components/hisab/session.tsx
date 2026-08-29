@@ -1,19 +1,31 @@
+/**
+ * কে অ্যাপটা চালাচ্ছে — লগইন ছাড়াই।
+ *
+ * এখন কোনো পাসওয়ার্ড নেই। ব্যবহারকারী প্রথমবার নিজের নামটা বেছে নেন, সেটা
+ * ফোনেই জমা থাকে এবং প্রতিটি এন্ট্রিতে লেখা হয়। পরে auth যোগ হলে এই
+ * প্রোভাইডারটাই আবার আসল সেশন থেকে নাম নেবে।
+ */
 import * as React from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { nameFromEmail } from "@/lib/hisab/auth";
+import {
+  clearCurrentUserName,
+  currentUserName,
+  onUserNameChange,
+  setCurrentUserName,
+} from "@/lib/hisab/db";
 
 type SessionState = {
-  status: "checking" | "out" | "in";
-  userId: string | null;
+  /** "checking" শুধু প্রথম রেন্ডারে, যখন localStorage এখনো পড়া হয়নি */
+  status: "checking" | "chooser" | "ready";
   userName: string;
-  refresh: () => void;
+  setUserName: (name: string) => void;
+  forgetUserName: () => void;
 };
 
 const Ctx = React.createContext<SessionState>({
   status: "checking",
-  userId: null,
   userName: "",
-  refresh: () => {},
+  setUserName: () => {},
+  forgetUserName: () => {},
 });
 
 export function useHisabSession() {
@@ -21,33 +33,23 @@ export function useHisabSession() {
 }
 
 export function HisabSessionProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = React.useState<Omit<SessionState, "refresh">>({
-    status: "checking",
-    userId: null,
-    userName: "",
-  });
-
-  const apply = React.useCallback((user: { id: string; email?: string } | null) => {
-    setState(
-      user
-        ? { status: "in", userId: user.id, userName: nameFromEmail(user.email) }
-        : { status: "out", userId: null, userName: "" },
-    );
-  }, []);
-
-  const refresh = React.useCallback(() => {
-    supabase.auth.getSession().then(({ data }) => apply(data.session?.user ?? null));
-  }, [apply]);
+  // সার্ভার রেন্ডারে localStorage নেই, তাই শুরুতে null
+  const [name, setName] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    refresh();
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      apply(session?.user ?? null);
-    });
-    return () => data.subscription.unsubscribe();
-  }, [apply, refresh]);
+    setName(currentUserName());
+    return onUserNameChange(() => setName(currentUserName()));
+  }, []);
 
-  const value = React.useMemo(() => ({ ...state, refresh }), [state, refresh]);
+  const value = React.useMemo<SessionState>(
+    () => ({
+      status: name === null ? "checking" : name ? "ready" : "chooser",
+      userName: name ?? "",
+      setUserName: setCurrentUserName,
+      forgetUserName: clearCurrentUserName,
+    }),
+    [name],
+  );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -18,7 +18,6 @@ import { Route as HisabCustomersRouteImport } from './routes/hisab.customers'
 import { Route as HisabFilesRouteImport } from './routes/hisab.files'
 import { Route as HisabHelpRouteImport } from './routes/hisab.help'
 import { Route as HisabListRouteImport } from './routes/hisab.list'
-import { Route as HisabLoginRouteImport } from './routes/hisab.login'
 import { Route as HisabMoreRouteImport } from './routes/hisab.more'
 import { Route as HisabNewRouteImport } from './routes/hisab.new'
 import { Route as HisabPartiesRouteImport } from './routes/hisab.parties'
@@ -90,11 +89,6 @@ const HisabHelpRoute = HisabHelpRouteImport.update({
 const HisabListRoute = HisabListRouteImport.update({
   id: '/list',
   path: '/list',
-  getParentRoute: () => HisabRoute,
-} as any)
-const HisabLoginRoute = HisabLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => HisabRoute,
 } as any)
 const HisabMoreRoute = HisabMoreRouteImport.update({
@@ -245,7 +239,6 @@ export interface FileRoutesByFullPath {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
-  '/hisab/login': typeof HisabLoginRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -283,7 +276,6 @@ export interface FileRoutesByTo {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
-  '/hisab/login': typeof HisabLoginRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -323,7 +315,6 @@ export interface FileRoutesById {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
-  '/hisab/login': typeof HisabLoginRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -364,7 +355,6 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
-    | '/hisab/login'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -402,7 +392,6 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
-    | '/hisab/login'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -441,7 +430,6 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
-    | '/hisab/login'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -553,13 +541,6 @@ declare module '@tanstack/react-router' {
       path: '/list'
       fullPath: '/hisab/list'
       preLoaderRoute: typeof HisabListRouteImport
-      parentRoute: typeof HisabRoute
-    }
-    '/hisab/login': {
-      id: '/hisab/login'
-      path: '/login'
-      fullPath: '/hisab/login'
-      preLoaderRoute: typeof HisabLoginRouteImport
       parentRoute: typeof HisabRoute
     }
     '/hisab/more': {
@@ -761,7 +742,6 @@ interface HisabRouteChildren {
   HisabFilesRoute: typeof HisabFilesRoute
   HisabHelpRoute: typeof HisabHelpRoute
   HisabListRoute: typeof HisabListRoute
-  HisabLoginRoute: typeof HisabLoginRoute
   HisabMoreRoute: typeof HisabMoreRoute
   HisabNewRoute: typeof HisabNewRoute
   HisabPartiesRoute: typeof HisabPartiesRoute
@@ -786,7 +766,6 @@ const HisabRouteChildren: HisabRouteChildren = {
   HisabFilesRoute: HisabFilesRoute,
   HisabHelpRoute: HisabHelpRoute,
   HisabListRoute: HisabListRoute,
-  HisabLoginRoute: HisabLoginRoute,
   HisabMoreRoute: HisabMoreRoute,
   HisabNewRoute: HisabNewRoute,
   HisabPartiesRoute: HisabPartiesRoute,

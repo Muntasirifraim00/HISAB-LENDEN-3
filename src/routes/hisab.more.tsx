@@ -6,7 +6,7 @@ import {
   FileBarChart,
   FolderOpen,
   HelpCircle,
-  LogOut,
+  UserCog,
   Package,
   Warehouse,
   Users,
@@ -14,7 +14,6 @@ import {
   Truck,
 } from "lucide-react";
 import { useHisabSession } from "@/components/hisab/session";
-import { hisabLogout } from "@/lib/hisab/auth";
 import { Avatar, Card, SectionTitle } from "@/components/hisab/ui";
 
 export const Route = createFileRoute("/hisab/more")({
@@ -66,7 +65,7 @@ const LINKS = [
 ];
 
 function MorePage() {
-  const { userName } = useHisabSession();
+  const { userName, forgetUserName } = useHisabSession();
 
   return (
     <div className="space-y-3">
@@ -75,7 +74,7 @@ function MorePage() {
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-bold text-slate-900 dark:text-slate-100">{userName}</p>
           <p className="text-[11px] text-slate-500">
-            আপনার লেখা প্রতিটা এন্ট্রিতে এই নামটা স্থায়ীভাবে থেকে যাবে।
+            আপনার লেখা প্রতিটা এন্ট্রিতে এই নামটা স্থায়ীভাবে থেকে যাবে। লগইন লাগে না।
           </p>
         </div>
       </Card>
@@ -108,11 +107,11 @@ function MorePage() {
       </Card>
 
       <button
-        onClick={() => hisabLogout()}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 py-3 text-[14px] font-bold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
+        onClick={() => forgetUserName()}
+        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[14px] font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
       >
-        <LogOut className="h-4 w-4" />
-        লগআউট
+        <UserCog className="h-4 w-4" />
+        নাম বদলান
       </button>
     </div>
   );

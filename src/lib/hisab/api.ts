@@ -4,7 +4,7 @@
  * সব লেখালেখি ডেটাবেসের RPC দিয়ে হয়, সরাসরি টেবিলে নয়। কারণ RPC-গুলো
  * এক ট্রানজেকশনে ইনভয়েস + আইটেম + স্টক সব একসাথে লেখে — অর্ধেক লেখা হয় না।
  */
-import { supabase } from "@/integrations/supabase/client";
+import { currentUserName, getDb } from "./db";
 import type {
   DetailEdit,
   Invoice,
@@ -23,8 +23,17 @@ import type {
 
 // হিসাবের টেবিলগুলো generated Supabase types-এ নেই (আলাদা মাইগ্রেশন),
 // তাই এই এক জায়গায় আলগা টাইপে ক্লায়েন্ট ধরা হয়েছে।
+//
+// Proxy দিয়ে ধরা হয়েছে যাতে ব্যবহারকারী নাম বদলালে পরের কলেই নতুন হেডার
+// নিয়ে বানানো ক্লায়েন্টটা ব্যবহৃত হয় — নিচের কোনো কল বদলাতে হয় না।
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as any;
+const db: any = new Proxy(
+  {},
+  {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    get: (_t, prop) => (getDb() as any)[prop],
+  },
+);
 
 function unwrap<T>(res: { data: T; error: { message: string } | null }): T {
   if (res.error) throw new Error(translateError(res.error.message));
@@ -224,19 +233,17 @@ export async function listParties() {
 /* ------------------------------ ছবি ------------------------------ */
 
 export async function uploadInvoiceImage(file: File) {
-  const { data: auth } = await supabase.auth.getUser();
-  const uid = auth.user?.id;
-  if (!uid) throw new Error("লগইন করুন।");
-
+  // লগইন নেই, তাই ফোল্ডারটা ব্যবহারকারীর নাম ধরে — ছবিগুলো অন্তত আলাদা থাকে
+  const who = (currentUserName() || "অতিথি").toLowerCase().replace(/[^a-z0-9]+/g, "") || "guest";
   const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase().slice(0, 5);
-  const path = `${uid}/${crypto.randomUUID()}.${ext}`;
+  const path = `${who}/${crypto.randomUUID()}.${ext}`;
 
-  const { error } = await supabase.storage
-    .from("hisab")
+  const { error } = await getDb()
+    .storage.from("hisab")
     .upload(path, file, { cacheControl: "31536000", upsert: false });
   if (error) throw new Error(translateError(error.message));
 
-  return supabase.storage.from("hisab").getPublicUrl(path).data.publicUrl;
+  return getDb().storage.from("hisab").getPublicUrl(path).data.publicUrl;
 }
 
 /** ফাইল পাতা — সব ইনভয়েসের ছবি */
