@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/hisab/customers")({
           return json(data);
         }
 
-        // Get single customer
+        // Get single customer (with summary totals merged in)
         if (customerId) {
           const { data, error } = await supabase
             .from("customers")
@@ -51,7 +51,13 @@ export const Route = createFileRoute("/api/hisab/customers")({
             return json({ error: error.message }, { status: 400 });
           }
 
-          return json(data);
+          const { data: summary } = await supabase
+            .from("vw_customer_summary")
+            .select("*")
+            .eq("id", customerId)
+            .maybeSingle();
+
+          return json({ ...data, ...(summary ?? {}) });
         }
 
         // Get all customers with summary
