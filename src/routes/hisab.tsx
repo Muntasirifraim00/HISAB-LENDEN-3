@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { HisabSessionProvider, useHisabSession } from "@/components/hisab/session";
 import { Avatar, Spinner } from "@/components/hisab/ui";
-import { HISAB_USERS } from "@/lib/hisab/constants";
+import { HISAB_USERS, checkUserPassword } from "@/lib/hisab/constants";
 
 export const Route = createFileRoute("/hisab")({
   head: () => ({
