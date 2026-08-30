@@ -14,23 +14,16 @@ export const HISAB_USERS = [
 export type HisabUserName = (typeof HISAB_USERS)[number]["name"];
 
 /**
- * সহজ বাধা — আসল লগইন নয়। প্রতিটি নামের নিজস্ব পাসওয়ার্ড, শুধু যাতে
- * যে কেউ ঢুকে না পড়ে। ভবিষ্যতে আসল auth এলে এটা বাদ দেওয়া যাবে।
+ * পাসওয়ার্ড এখানে নেই — থাকা উচিতও নয়।
+ *
+ * আগে ছয়জনের পাসওয়ার্ড এই ফাইলেই লেখা ছিল, আর মিলিয়ে দেখা হতো ব্রাউজারে।
+ * ফাইলটা ব্রাউজারে পাঠানো bundle-এর অংশ, তাই যে কেউ সোর্স দেখে সব পাসওয়ার্ড
+ * পড়ে নিতে পারত — আর ডেটাবেস কখনো যাচাই করত না বলে পাসওয়ার্ড না জানলেও
+ * সরাসরি API-তে সব লেখা-পড়া করা যেত।
+ *
+ * এখন যাচাই হয় Supabase Auth-এ, আর ডেটাবেসের সব অনুমতি `authenticated`
+ * রোলের জন্য — লগইন ছাড়া কিছুই ছোঁয়া যায় না।
  */
-export const HISAB_PASSWORDS: Record<string, string> = {
-  ISMAIL: "ismail1@",
-  KHOKA: "khoka2#",
-  MUNTSIR: "muntsir3$",
-  RUBEL: "rubel4%",
-  SHOWKOT: "showkot5&",
-  TASLIM: "taslim6*",
-};
-
-export const checkUserPassword = (name: string, pass: string) =>
-  HISAB_PASSWORDS[(name ?? "").toUpperCase()] === pass.trim();
-
-/** পুঁজিতে নতুন টাকা যোগ করার সময় লাগে */
-export const ADMIN_PASSWORD = "hisab-admin7@";
 
 /** ব্যবহারকারীর নাম → লগইন ইমেইল। সাইনআপ নেই, নাম বাছাই। */
 export const AUTH_DOMAIN = "hisab.local";

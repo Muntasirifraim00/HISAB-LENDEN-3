@@ -4,7 +4,7 @@
  * সব লেখালেখি ডেটাবেসের RPC দিয়ে হয়, সরাসরি টেবিলে নয়। কারণ RPC-গুলো
  * এক ট্রানজেকশনে ইনভয়েস + আইটেম + স্টক সব একসাথে লেখে — অর্ধেক লেখা হয় না।
  */
-import { currentUserName, getDb } from "./db";
+import { getDb } from "./db";
 import type {
   DetailEdit,
   Invoice,
@@ -233,10 +233,14 @@ export async function listParties() {
 /* ------------------------------ ছবি ------------------------------ */
 
 export async function uploadInvoiceImage(file: File) {
-  // লগইন নেই, তাই ফোল্ডারটা ব্যবহারকারীর নাম ধরে — ছবিগুলো অন্তত আলাদা থাকে
-  const who = (currentUserName() || "অতিথি").toLowerCase().replace(/[^a-z0-9]+/g, "") || "guest";
+  // স্টোরেজের নীতি বলে ফোল্ডারের নাম হতে হবে ব্যবহারকারীর id — আগে এখানে
+  // নাম বসত, ফলে আপলোড আটকে যেত।
+  const { data: auth } = await getDb().auth.getUser();
+  const uid = auth.user?.id;
+  if (!uid) throw new Error("লগইন করুন।");
+
   const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase().slice(0, 5);
-  const path = `${who}/${crypto.randomUUID()}.${ext}`;
+  const path = `${uid}/${crypto.randomUUID()}.${ext}`;
 
   const { error } = await getDb()
     .storage.from("hisab")

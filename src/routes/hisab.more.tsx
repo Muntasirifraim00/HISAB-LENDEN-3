@@ -65,7 +65,7 @@ const LINKS = [
 ];
 
 function MorePage() {
-  const { userName, forgetUserName } = useHisabSession();
+  const { userName, signOut } = useHisabSession();
 
   return (
     <div className="space-y-3">
@@ -107,11 +107,11 @@ function MorePage() {
       </Card>
 
       <button
-        onClick={() => forgetUserName()}
+        onClick={() => void signOut()}
         className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[14px] font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
       >
         <UserCog className="h-4 w-4" />
-        নাম বদলান
+        বেরিয়ে যান
       </button>
     </div>
   );
