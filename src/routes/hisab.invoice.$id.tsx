@@ -354,23 +354,49 @@ function InvoiceDetail() {
         </Card>
       ) : null}
 
-      {/* খরচের খাত */}
+      {/* খরচের খাত — খরচ এন্ট্রিতে "খাত", ক্রয়/বিক্রয়ে "অতিরিক্ত খরচ" */}
       {(expenses.data ?? []).length ? (
         <Card>
-          <SectionTitle title="খরচের খাত" />
+          <SectionTitle title={inv.type === "expense" ? "খরচের খাত" : "অতিরিক্ত খরচ"} />
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {(expenses.data ?? []).map((ex) => (
               <div key={ex.id} className="flex items-center justify-between py-2 text-[13px]">
-                <span className="text-slate-700 dark:text-slate-300">
+                <span className="min-w-0 text-slate-700 dark:text-slate-300">
                   {ex.head}
+                  {ex.paid_to ? (
+                    <span className="ml-1.5 text-[11px] text-slate-500">→ {ex.paid_to}</span>
+                  ) : null}
                   {ex.note ? (
                     <span className="ml-1.5 text-[11px] text-slate-400">{ex.note}</span>
                   ) : null}
                 </span>
-                <span className="font-bold">{money(ex.amount)}</span>
+                <span className="shrink-0 font-bold">{money(ex.amount)}</span>
               </div>
             ))}
           </div>
+
+          {/* ক্রয়/বিক্রয়ে বিল আর অতিরিক্ত মিলিয়ে আসল খরচটা কত */}
+          {inv.type !== "expense" && num(inv.extra_cost) > 0 ? (
+            <div className="mt-2 space-y-1 rounded-xl bg-slate-900 px-3 py-2.5 text-[12px] text-white dark:bg-slate-800">
+              <div className="flex items-center justify-between opacity-75">
+                <span>বিল</span>
+                <span>{money(inv.total_amount)}</span>
+              </div>
+              <div className="flex items-center justify-between opacity-75">
+                <span>অতিরিক্ত খরচ</span>
+                <span>+ {money(num(inv.extra_cost))}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-white/20 pt-1 text-[13px] font-bold">
+                <span>মোট খরচ</span>
+                <span>{money(num(inv.total_amount) + num(inv.extra_cost))}</span>
+              </div>
+              <p className="pt-0.5 text-[11px] leading-relaxed opacity-70">
+                {inv.type === "purchase"
+                  ? "অতিরিক্ত খরচ পণ্যের দরে ভাগ হয়ে গেছে — বিক্রির সময় এই দরই ধরা হবে।"
+                  : "অতিরিক্ত খরচ লাভ থেকে বাদ গেছে।"}
+              </p>
+            </div>
+          ) : null}
         </Card>
       ) : null}
 

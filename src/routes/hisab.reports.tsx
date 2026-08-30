@@ -102,6 +102,8 @@ function ReportsPage() {
         acc.expenses += amount;
         acc.payable += num(r.due_amount);
       }
+      // ক্রয়/বিক্রয়ের সাথে জড়ানো গাড়ি ভাড়া, লেবার ইত্যাদি
+      acc.extra += num(r.extra_cost);
       acc.collected += r.type === "sale" ? num(r.paid_amount) : 0;
       acc.paidOut += r.type !== "sale" ? num(r.paid_amount) : 0;
       return acc;
@@ -110,6 +112,7 @@ function ReportsPage() {
       sales: 0,
       purchases: 0,
       expenses: 0,
+      extra: 0,
       profit: 0,
       cogs: 0,
       receivable: 0,
@@ -258,6 +261,9 @@ function ReportsPage() {
                 <Line label="বিক্রয়" value={totals.sales} />
                 <Line label="বিক্রীত মালের ক্রয়মূল্য (FIFO)" value={-totals.cogs} />
                 <Line label="মোট লাভ" value={totals.profit} bold />
+                {totals.extra > 0 ? (
+                  <Line label="পরিবহন ও অন্যান্য (চালানের সাথে)" value={-totals.extra} />
+                ) : null}
                 <Line label="পরিচালন খরচ" value={-totals.expenses} />
                 <div className="border-t border-slate-200 pt-1.5 dark:border-slate-700">
                   <Line label="নিট মুনাফা" value={net} bold />

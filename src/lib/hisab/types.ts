@@ -18,6 +18,8 @@ export type Invoice = {
   no_image_reason: string | null;
   cogs: number;
   profit: number;
+  /** এই চালানের সাথে জড়িত অতিরিক্ত খরচের মোট (গাড়ি ভাড়া, লেবার…) */
+  extra_cost: number;
   stock_shortfall: boolean;
   goods_status: GoodsStatus;
   is_reversal: boolean;
@@ -39,6 +41,8 @@ export type InvoiceItem = {
   unit_price: number;
   cost_price: number | null;
   line_total: number;
+  /** সারির দাম + তার ভাগে পড়া অতিরিক্ত খরচ — গুদামে পৌঁছানো পর্যন্ত মোট */
+  landed_total: number | null;
   line_cogs: number;
   received_qty: number;
   created_at: string;
@@ -71,6 +75,8 @@ export type InvoiceExpense = {
   head: string;
   amount: number;
   note: string | null;
+  /** কাকে টাকাটা দেওয়া হলো — গাড়িচালক, কুলি সর্দার… */
+  paid_to: string | null;
 };
 
 export type DetailEdit = {
@@ -160,7 +166,7 @@ export type NewInvoiceInput = {
     unit_price: number;
     line_total: number;
   }[];
-  expenses?: { head: string; amount: number; note?: string | null }[];
+  expenses?: { head: string; amount: number; note?: string | null; paid_to?: string | null }[];
 };
 
 export type InvoiceFilters = {

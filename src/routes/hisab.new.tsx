@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { createInvoice, listInvoices, listProducts, uploadInvoiceImage } from "@/lib/hisab/api";
 import {
   EXPENSE_HEADS,
+  EXTRA_COST_HEADS,
   INVOICE_TYPES,
   PAYMENT_METHODS,
   type InvoiceType,
@@ -54,7 +55,7 @@ type ItemRow = {
   qty: string;
   unit_price: string;
 };
-type ExpenseRow = { key: string; head: string; amount: string; note: string };
+type ExpenseRow = { key: string; head: string; amount: string; note: string; paid_to: string };
 
 type FormState = {
   type: InvoiceType;
@@ -84,11 +85,16 @@ const blankItem = (): ItemRow => ({
   qty: "1",
   unit_price: "",
 });
-const blankExpense = (): ExpenseRow => ({
+/**
+ * খরচের নতুন সারি। "খরচ" ধরনের এন্ট্রিতে দোকানের নিজের খাত (ভাড়া,
+ * বিদ্যুৎ), আর ক্রয়/বিক্রয়ে চালানের সাথে জড়ানো খাত (গাড়ি ভাড়া, লেবার)।
+ */
+const blankExpense = (type: InvoiceType): ExpenseRow => ({
   key: newKey(),
-  head: EXPENSE_HEADS[0],
+  head: type === "expense" ? EXPENSE_HEADS[0] : EXTRA_COST_HEADS[0],
   amount: "",
   note: "",
+  paid_to: "",
 });
 
 function initialState(type: InvoiceType): FormState {
@@ -305,6 +311,15 @@ function NewEntry() {
   const itemsTotal = form.items.reduce((s, it) => s + num(it.qty) * num(it.unit_price), 0);
   const expensesTotal = form.expenses.reduce((s, e) => s + num(e.amount), 0);
 
+  /**
+   * ক্রয়ে প্রতি এককের প্রকৃত দর — বিল ও অতিরিক্ত খরচ মিলিয়ে, মোট
+   * পরিমাণ দিয়ে ভাগ। ডেটাবেসে খরচটা সারির দামের অনুপাতে ভাগ হয়, তাই
+   * সারিভেদে দর আলাদা হতে পারে; এটা কেবল গড় ধারণা দেওয়ার জন্য।
+   */
+  const totalQty = form.items.reduce((s, it) => s + num(it.qty), 0);
+  const landedUnit =
+    form.type === "purchase" && totalQty > 0 ? (itemsTotal + expensesTotal) / totalQty : null;
+
   /** পণ্য/খরচের সারি থাকলে মোট অঙ্ক সেখান থেকেই আসে */
   const autoTotal = form.items.length ? itemsTotal : form.expenses.length ? expensesTotal : 0;
   const total = form.total_amount ? num(form.total_amount) : autoTotal;
@@ -340,12 +355,16 @@ function NewEntry() {
                 unit_price: num(it.unit_price),
                 line_total: Math.round(num(it.qty) * num(it.unit_price) * 100) / 100,
               })),
-      expenses:
-        form.type === "expense"
-          ? form.expenses
-              .filter((e) => num(e.amount) > 0)
-              .map((e) => ({ head: e.head, amount: num(e.amount), note: e.note.trim() || null }))
-          : [],
+      // খরচের সারি এখন সব ধরনের এন্ট্রিতেই যায় — ক্রয়/বিক্রয়ে এগুলোই
+      // গাড়ি ভাড়া, লেবার ইত্যাদি অতিরিক্ত খরচ
+      expenses: form.expenses
+        .filter((e) => num(e.amount) > 0)
+        .map((e) => ({
+          head: e.head,
+          amount: num(e.amount),
+          note: e.note.trim() || null,
+          paid_to: e.paid_to.trim() || null,
+        })),
     }),
     [form, total, imageFile],
   );
@@ -718,7 +737,7 @@ function NewEntry() {
                 size="sm"
                 variant="outline"
                 onClick={() =>
-                  setForm((p) => ({ ...p, expenses: [...p.expenses, blankExpense()] }))
+                  setForm((p) => ({ ...p, expenses: [...p.expenses, blankExpense(form.type)] }))
                 }
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -792,6 +811,129 @@ function NewEntry() {
           )}
         </Card>
       )}
+
+      {/* অতিরিক্ত খরচ — শুধু ক্রয়/বিক্রয়ে। মাল গুদামে পৌঁছানো পর্যন্ত
+          গাড়ি ভাড়া, লেবার ইত্যাদি যা লাগে। */}
+      {form.type !== "expense" ? (
+        <Card>
+          <SectionTitle
+            title="অতিরিক্ত খরচ"
+            right={
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setForm((p) => ({ ...p, expenses: [...p.expenses, blankExpense(form.type)] }))
+                }
+              >
+                <Plus className="h-3.5 w-3.5" />
+                খরচ
+              </Button>
+            }
+          />
+
+          {form.expenses.length === 0 ? (
+            <p className="rounded-xl bg-slate-50 px-3 py-4 text-center text-[12px] leading-relaxed text-slate-500 dark:bg-slate-800/60">
+              গাড়ি ভাড়া, লেবার, লোড-আনলোড — মাল আনতে বাড়তি কিছু খরচ হলে এখানে লিখুন।
+              {form.type === "purchase"
+                ? " খরচটা পণ্যের দরে ভাগ হয়ে যাবে, তাই লাভের হিসাব সঠিক থাকবে।"
+                : " খরচটা লাভ থেকে বাদ যাবে।"}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {form.expenses.map((ex) => (
+                <div key={ex.key} className="rounded-xl bg-slate-50 p-2.5 dark:bg-slate-800/60">
+                  <div className="flex items-end gap-2">
+                    <Select
+                      value={ex.head}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          expenses: p.expenses.map((x) =>
+                            x.key === ex.key ? { ...x, head: e.target.value } : x,
+                          ),
+                        }))
+                      }
+                      className="flex-1"
+                    >
+                      {EXTRA_COST_HEADS.map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ))}
+                    </Select>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      value={ex.amount}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          expenses: p.expenses.map((x) =>
+                            x.key === ex.key ? { ...x, amount: e.target.value } : x,
+                          ),
+                        }))
+                      }
+                      placeholder="টাকা"
+                      className="w-28"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((p) => ({
+                          ...p,
+                          expenses: p.expenses.filter((x) => x.key !== ex.key),
+                        }))
+                      }
+                      className="pb-2.5 text-slate-400 hover:text-rose-600"
+                      aria-label="খরচ মুছুন"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <Input
+                    value={ex.paid_to}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        expenses: p.expenses.map((x) =>
+                          x.key === ex.key ? { ...x, paid_to: e.target.value } : x,
+                        ),
+                      }))
+                    }
+                    placeholder="কাকে দিলেন? (ঐচ্ছিক)"
+                    className="mt-2"
+                  />
+                </div>
+              ))}
+
+              {/* মোট কত খরচ হলো — বিল আর অতিরিক্ত আলাদা করে */}
+              <div className="space-y-1 rounded-xl bg-slate-900 px-3 py-2.5 text-[13px] text-white dark:bg-slate-800">
+                <div className="flex items-center justify-between opacity-75">
+                  <span>বিল</span>
+                  <span>{money(total)}</span>
+                </div>
+                <div className="flex items-center justify-between opacity-75">
+                  <span>অতিরিক্ত খরচ</span>
+                  <span>+ {money(expensesTotal)}</span>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/20 pt-1 font-bold">
+                  <span>মোট খরচ</span>
+                  <span>{money(total + expensesTotal)}</span>
+                </div>
+                {form.type === "purchase" && landedUnit != null ? (
+                  <p className="pt-0.5 text-[11px] opacity-75">
+                    প্রতি একক দাঁড়াচ্ছে {money(landedUnit)} — বিক্রির সময় এই দরই ধরা হবে
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          )}
+        </Card>
+      ) : null}
 
       {/* অগ্রিম ক্রয় */}
       {form.type === "purchase" ? (
