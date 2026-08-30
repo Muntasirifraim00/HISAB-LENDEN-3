@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { hisabFetch } from "@/lib/hisab/apiFetch";
-import { ADMIN_PASSWORD } from "@/lib/hisab/constants";
+import { useHisabSession } from "@/components/hisab/session";
 
 export const Route = createFileRoute("/hisab/capital")({
   component: CapitalPage,
@@ -16,6 +16,8 @@ function CapitalPage() {
   const [injectAmount, setInjectAmount] = useState("");
   const [injectNote, setInjectNote] = useState("");
   const [adminPass, setAdminPass] = useState("");
+  const [checking, setChecking] = useState(false);
+  const { verifyPassword } = useHisabSession();
   const [adminErr, setAdminErr] = useState("");
 
   const { data: capital, isLoading: capitalLoading } = useQuery({
@@ -93,11 +95,21 @@ function CapitalPage() {
     initMutation.mutate();
   };
 
-  const handleInjectSubmit = (e: React.FormEvent) => {
+  // পুঁজিতে টাকা যোগ করা সংবেদনশীল, তাই আবার পাসওয়ার্ড চাওয়া হয়।
+  // আগে এখানে একটা "অ্যাডমিন পাসওয়ার্ড" মেলানো হতো, যেটা কোডেই লেখা ছিল
+  // আর ব্রাউজারের bundle-এ চলে যেত। এখন যিনি ঢুকে আছেন তাঁর নিজের
+  // পাসওয়ার্ডটাই Supabase-এ যাচাই করা হয় — নতুন কোনো গোপন কথা নেই।
+  const handleInjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!injectAmount || parseFloat(injectAmount) <= 0) return;
-    if (adminPass.trim() !== ADMIN_PASSWORD) {
-      setAdminErr("অ্যাডমিন পাসওয়ার্ড মেলেনি।");
+    if (checking) return;
+
+    setChecking(true);
+    const message = await verifyPassword(adminPass.trim());
+    setChecking(false);
+
+    if (message) {
+      setAdminErr(message);
       return;
     }
     setAdminErr("");
@@ -226,7 +238,7 @@ function CapitalPage() {
                     setAdminPass(e.target.value);
                     setAdminErr("");
                   }}
-                  placeholder="অ্যাডমিন পাসওয়ার্ড"
+                  placeholder="আপনার পাসওয়ার্ড"
                   className="w-full rounded border border-stroke bg-bg px-3 py-2 text-ink"
                 />
                 {adminErr ? (

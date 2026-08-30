@@ -44,7 +44,6 @@ import { Route as ApiHisabWarehousesRouteImport } from './routes/api/hisab/wareh
 import { Route as HisabCustomerIdRouteImport } from './routes/hisab.customer.$id'
 import { Route as HisabInvoiceIdRouteImport } from './routes/hisab.invoice.$id'
 import { Route as HisabSupplierIdRouteImport } from './routes/hisab.supplier.$id'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -223,12 +222,6 @@ const HisabSupplierIdRoute = HisabSupplierIdRouteImport.update({
   path: '/supplier/$id',
   getParentRoute: () => HisabRoute,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -266,7 +259,6 @@ export interface FileRoutesByFullPath {
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -303,7 +295,6 @@ export interface FileRoutesByTo {
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -342,7 +333,6 @@ export interface FileRoutesById {
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
   '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -382,7 +372,6 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
-    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -419,7 +408,6 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
-    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -457,7 +445,6 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
-    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -475,7 +462,6 @@ export interface RootRouteChildren {
   ApiHisabSuppliersRoute: typeof ApiHisabSuppliersRoute
   ApiHisabWarehouseStockRoute: typeof ApiHisabWarehouseStockRoute
   ApiHisabWarehousesRoute: typeof ApiHisabWarehousesRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -725,13 +711,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HisabSupplierIdRouteImport
       parentRoute: typeof HisabRoute
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -800,7 +779,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHisabSuppliersRoute: ApiHisabSuppliersRoute,
   ApiHisabWarehouseStockRoute: ApiHisabWarehouseStockRoute,
   ApiHisabWarehousesRoute: ApiHisabWarehousesRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

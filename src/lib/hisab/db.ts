@@ -1,75 +1,41 @@
 /**
- * হিসাব — লগইন ছাড়া চলার সময়ের ডেটাবেস ক্লায়েন্ট।
+ * হিসাব — ব্রাউজারের Supabase ক্লায়েন্ট।
  *
- * এখন কোনো লগইন নেই, তাই "কে এন্ট্রি লিখল" সেটা টোকেন থেকে আসে না —
- * প্রতিটি অনুরোধের `x-hisab-user` হেডারে নামটা যায়, আর ডেটাবেসে
- * hb_actor_name() সেখান থেকেই নামটা নেয়।
+ * আগে "কে লিখল" যেত `x-hisab-user` হেডারে, কারণ লগইন ছিল না। এখন ছয়জনের
+ * প্রত্যেকের নিজের Supabase অ্যাকাউন্ট আছে, তাই নামটা আসে টোকেন থেকেই —
+ * ডেটাবেসে hb_actor_name() ইমেইলের প্রথম অংশ (ismail@hisab.local → ISMAIL)
+ * ব্যবহার করে। হেডারটা আর পাঠানো হয় না: ওটা যে কেউ বদলে দিতে পারত, ফলে
+ * খাতায় অন্যের নামে সই করা সম্ভব ছিল।
  *
- * নাম বদলালে হেডারও বদলাতে হয়, তাই ক্লায়েন্টটা নাম ধরে ধরে বানানো হয়।
+ * ক্লায়েন্টটা `@/integrations/supabase/client` থেকেই নেওয়া — সেটাই সেশন
+ * ধরে রাখে, টোকেন নবায়ন করে, আর প্রতিটি অনুরোধে Authorization বসায়।
  */
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-
-const STORAGE_KEY = "hisab:user";
-
-type Listener = () => void;
-const listeners = new Set<Listener>();
-
-let cached: { name: string; client: SupabaseClient } | null = null;
-
-/** এখন কার নামে কাজ হচ্ছে। কেউ বেছে না নিলে ফাঁকা। */
-export function currentUserName(): string {
-  if (typeof window === "undefined") return "";
-  try {
-    return localStorage.getItem(STORAGE_KEY) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-export function setCurrentUserName(name: string) {
-  try {
-    localStorage.setItem(STORAGE_KEY, name.toUpperCase());
-  } catch {
-    /* বেসরকারি উইন্ডোতে লেখা না গেলেও অ্যাপ চলবে */
-  }
-  cached = null; // পরের কলে নতুন হেডার নিয়ে ক্লায়েন্ট তৈরি হবে
-  listeners.forEach((l) => l());
-}
-
-export function clearCurrentUserName() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* উপেক্ষা */
-  }
-  cached = null;
-  listeners.forEach((l) => l());
-}
-
-/** নাম বদলালে জানায় — সেশন প্রোভাইডার এটা শোনে */
-export function onUserNameChange(fn: Listener) {
-  listeners.add(fn);
-  return () => listeners.delete(fn);
-}
-
-function build(name: string): SupabaseClient {
-  const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-
-  if (!url || !key) {
-    throw new Error("Supabase-এর ঠিকানা বা কি নেই।");
-  }
-
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: name ? { "x-hisab-user": name } : {} },
-  });
-}
+import { supabase } from "@/integrations/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export function getDb(): SupabaseClient {
-  const name = currentUserName();
-  if (!cached || cached.name !== name) {
-    cached = { name, client: build(name) };
-  }
-  return cached.client;
+  return supabase as unknown as SupabaseClient;
+}
+
+/**
+ * এখনকার ব্যবহারকারীর নাম, বড় হাতে — ইমেইলের প্রথম অংশ থেকে।
+ * লগইন না থাকলে ফাঁকা।
+ *
+ * সমকালীন (sync) ফাংশন, কারণ ডাকা হয় রেন্ডারের মধ্যে। সেশন প্রোভাইডার
+ * লগইন/লগআউটে এটা হালনাগাদ রাখে।
+ */
+let userName = "";
+
+export function currentUserName(): string {
+  return userName;
+}
+
+/** কেবল সেশন প্রোভাইডার ডাকে, Supabase-এর সেশন বদলালে */
+export function setCurrentUserName(name: string) {
+  userName = (name ?? "").toUpperCase();
+}
+
+/** ইমেইল থেকে নাম — ismail@hisab.local → ISMAIL */
+export function nameFromEmail(email?: string | null): string {
+  return (email ?? "").split("@")[0].toUpperCase();
 }

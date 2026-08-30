@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { HisabSessionProvider, useHisabSession } from "@/components/hisab/session";
 import { Avatar, Spinner } from "@/components/hisab/ui";
-import { HISAB_USERS, checkUserPassword } from "@/lib/hisab/constants";
+import { HISAB_USERS } from "@/lib/hisab/constants";
 
 export const Route = createFileRoute("/hisab")({
   head: () => ({
@@ -55,8 +55,7 @@ function Shell() {
     );
   }
 
-  // লগইন নেই — প্রথমবার শুধু নামটা জেনে নেওয়া হয়, পাসওয়ার্ড লাগে না
-  if (status === "chooser") {
+  if (status === "login") {
     return <NamePicker />;
   }
 
@@ -72,23 +71,32 @@ function Shell() {
 }
 
 /**
- * প্রথমবার খোলার পর্দা — নাম বেছে নিয়ে নিজের পাসওয়ার্ড দিতে হয়।
- * এটা আসল লগইন নয়, শুধু সহজ একটা বাধা।
+ * ঢোকার পর্দা — নাম বেছে নিজের পাসওয়ার্ড দিতে হয়।
+ *
+ * পাসওয়ার্ড যাচাই হয় Supabase Auth-এ, ব্রাউজারে নয়। ঠিক হলে সেশনটা
+ * তৈরি হয় আর onAuthStateChange নিজেই পর্দা বদলে দেয়।
  */
 function NamePicker() {
-  const { setUserName } = useHisabSession();
+  const { signIn } = useHisabSession();
   const [picked, setPicked] = React.useState<string | null>(null);
   const [pass, setPass] = React.useState("");
   const [err, setErr] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!picked) return;
-    if (checkUserPassword(picked, pass)) {
-      setUserName(picked);
-    } else {
-      setErr("পাসওয়ার্ড মেলেনি। আবার চেষ্টা করুন।");
+    if (!picked || busy) return;
+
+    setBusy(true);
+    setErr("");
+    const message = await signIn(picked, pass.trim());
+    setBusy(false);
+
+    if (message) {
+      setErr(message);
+      setPass("");
     }
+    // সফল হলে কিছু করার নেই — সেশন বদলালেই Shell নিজে থেকে পাল্টাবে
   };
 
   return (
@@ -112,6 +120,8 @@ function NamePicker() {
               <input
                 autoFocus
                 type="password"
+                autoComplete="current-password"
+                disabled={busy}
                 value={pass}
                 onChange={(e) => {
                   setPass(e.target.value);
@@ -124,12 +134,14 @@ function NamePicker() {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 rounded-xl bg-[#132a6b] px-3 py-2.5 text-[13px] font-bold text-white"
+                  disabled={busy || !pass.trim()}
+                  className="flex-1 rounded-xl bg-[#132a6b] px-3 py-2.5 text-[13px] font-bold text-white disabled:opacity-50"
                 >
-                  ঢুকুন
+                  {busy ? "দেখা হচ্ছে…" : "ঢুকুন"}
                 </button>
                 <button
                   type="button"
+                  disabled={busy}
                   onClick={() => {
                     setPicked(null);
                     setPass("");
@@ -162,7 +174,7 @@ function NamePicker() {
               </div>
 
               <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-                ভুল নাম বেছে ফেললে “আরও” থেকে যেকোনো সময় বদলানো যাবে।
+                নিজের নামটাই বেছে নিন — খাতায় এই নামেই সই হবে।
               </p>
             </>
           )}
@@ -174,7 +186,7 @@ function NamePicker() {
 
 function TopBar({ userName }: { userName: string }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const { forgetUserName } = useHisabSession();
+  const { signOut } = useHisabSession();
 
   return (
     <header className="sticky top-0 z-30 bg-[#132a6b] text-white shadow-md">
@@ -223,10 +235,10 @@ function TopBar({ userName }: { userName: string }) {
               সাহায্য
             </Link>
             <button
-              onClick={() => forgetUserName()}
+              onClick={() => void signOut()}
               className="ml-auto rounded-lg bg-white/10 px-3 py-1.5 font-semibold"
             >
-              নাম বদলান
+              বেরিয়ে যান
             </button>
           </div>
         </div>
