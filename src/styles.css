@@ -149,3 +149,21 @@
     display: none;
   }
 }
+
+/* ইনভয়েস ছাপানো — কাগজে শুধু দলিলটুকুই উঠুক */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #hisab-invoice-doc,
+  #hisab-invoice-doc * {
+    visibility: visible;
+  }
+  #hisab-invoice-doc {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+}

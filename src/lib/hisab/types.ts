@@ -222,4 +222,25 @@ export type InvoiceFilters = {
   maxAmount?: number | null;
   dueOnly?: boolean;
   pendingGoodsOnly?: boolean;
+  /** শুধু এই ব্যবহারকারীর লেখা এন্ট্রি (বিক্রেতার নিজের তালিকা) */
+  createdBy?: string;
+};
+
+/** জমা দেওয়ার খাতার একটা টোকা — কে কখন কী জমা দিল */
+export type SubmissionLog = {
+  id: number;
+  user_id: string | null;
+  user_name: string;
+  action: string;
+  entity: string | null;
+  entity_id: string | null;
+  summary: {
+    memo_no?: string | null;
+    party?: string | null;
+    invoice_date?: string;
+    total?: number;
+    paid?: number;
+    items?: number;
+  } | null;
+  created_at: string;
 };

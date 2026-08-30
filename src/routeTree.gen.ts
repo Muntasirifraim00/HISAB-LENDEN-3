@@ -19,6 +19,8 @@ import { Route as HisabCustomersRouteImport } from './routes/hisab.customers'
 import { Route as HisabFilesRouteImport } from './routes/hisab.files'
 import { Route as HisabHelpRouteImport } from './routes/hisab.help'
 import { Route as HisabListRouteImport } from './routes/hisab.list'
+import { Route as HisabLogsRouteImport } from './routes/hisab.logs'
+import { Route as HisabMakerRouteImport } from './routes/hisab.maker'
 import { Route as HisabMoreRouteImport } from './routes/hisab.more'
 import { Route as HisabNewRouteImport } from './routes/hisab.new'
 import { Route as HisabPartiesRouteImport } from './routes/hisab.parties'
@@ -45,6 +47,7 @@ import { Route as ApiHisabWarehousesRouteImport } from './routes/api/hisab/wareh
 import { Route as HisabCustomerIdRouteImport } from './routes/hisab.customer.$id'
 import { Route as HisabInvoiceIdRouteImport } from './routes/hisab.invoice.$id'
 import { Route as HisabSupplierIdRouteImport } from './routes/hisab.supplier.$id'
+import { Route as HisabInvoiceIdPrintRouteImport } from './routes/hisab.invoice.$id.print'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,6 +97,16 @@ const HisabHelpRoute = HisabHelpRouteImport.update({
 const HisabListRoute = HisabListRouteImport.update({
   id: '/list',
   path: '/list',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabLogsRoute = HisabLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabMakerRoute = HisabMakerRouteImport.update({
+  id: '/maker',
+  path: '/maker',
   getParentRoute: () => HisabRoute,
 } as any)
 const HisabMoreRoute = HisabMoreRouteImport.update({
@@ -228,6 +241,11 @@ const HisabSupplierIdRoute = HisabSupplierIdRouteImport.update({
   path: '/supplier/$id',
   getParentRoute: () => HisabRoute,
 } as any)
+const HisabInvoiceIdPrintRoute = HisabInvoiceIdPrintRouteImport.update({
+  id: '/print',
+  path: '/print',
+  getParentRoute: () => HisabInvoiceIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -239,6 +257,8 @@ export interface FileRoutesByFullPath {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
+  '/hisab/logs': typeof HisabLogsRoute
+  '/hisab/maker': typeof HisabMakerRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -264,8 +284,9 @@ export interface FileRoutesByFullPath {
   '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
   '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
-  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRouteWithChildren
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/hisab/invoice/$id/print': typeof HisabInvoiceIdPrintRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -276,6 +297,8 @@ export interface FileRoutesByTo {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
+  '/hisab/logs': typeof HisabLogsRoute
+  '/hisab/maker': typeof HisabMakerRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -301,8 +324,9 @@ export interface FileRoutesByTo {
   '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
   '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
-  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRouteWithChildren
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/hisab/invoice/$id/print': typeof HisabInvoiceIdPrintRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -315,6 +339,8 @@ export interface FileRoutesById {
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
   '/hisab/list': typeof HisabListRoute
+  '/hisab/logs': typeof HisabLogsRoute
+  '/hisab/maker': typeof HisabMakerRoute
   '/hisab/more': typeof HisabMoreRoute
   '/hisab/new': typeof HisabNewRoute
   '/hisab/parties': typeof HisabPartiesRoute
@@ -340,8 +366,9 @@ export interface FileRoutesById {
   '/api/hisab/warehouse-stock': typeof ApiHisabWarehouseStockRoute
   '/api/hisab/warehouses': typeof ApiHisabWarehousesRoute
   '/hisab/customer/$id': typeof HisabCustomerIdRoute
-  '/hisab/invoice/$id': typeof HisabInvoiceIdRoute
+  '/hisab/invoice/$id': typeof HisabInvoiceIdRouteWithChildren
   '/hisab/supplier/$id': typeof HisabSupplierIdRoute
+  '/hisab/invoice/$id/print': typeof HisabInvoiceIdPrintRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -355,6 +382,8 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
+    | '/hisab/logs'
+    | '/hisab/maker'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -382,6 +411,7 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
+    | '/hisab/invoice/$id/print'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -392,6 +422,8 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
+    | '/hisab/logs'
+    | '/hisab/maker'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -419,6 +451,7 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
+    | '/hisab/invoice/$id/print'
   id:
     | '__root__'
     | '/'
@@ -430,6 +463,8 @@ export interface FileRouteTypes {
     | '/hisab/files'
     | '/hisab/help'
     | '/hisab/list'
+    | '/hisab/logs'
+    | '/hisab/maker'
     | '/hisab/more'
     | '/hisab/new'
     | '/hisab/parties'
@@ -457,6 +492,7 @@ export interface FileRouteTypes {
     | '/hisab/customer/$id'
     | '/hisab/invoice/$id'
     | '/hisab/supplier/$id'
+    | '/hisab/invoice/$id/print'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -546,6 +582,20 @@ declare module '@tanstack/react-router' {
       path: '/list'
       fullPath: '/hisab/list'
       preLoaderRoute: typeof HisabListRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/logs': {
+      id: '/hisab/logs'
+      path: '/logs'
+      fullPath: '/hisab/logs'
+      preLoaderRoute: typeof HisabLogsRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/maker': {
+      id: '/hisab/maker'
+      path: '/maker'
+      fullPath: '/hisab/maker'
+      preLoaderRoute: typeof HisabMakerRouteImport
       parentRoute: typeof HisabRoute
     }
     '/hisab/more': {
@@ -730,8 +780,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HisabSupplierIdRouteImport
       parentRoute: typeof HisabRoute
     }
+    '/hisab/invoice/$id/print': {
+      id: '/hisab/invoice/$id/print'
+      path: '/print'
+      fullPath: '/hisab/invoice/$id/print'
+      preLoaderRoute: typeof HisabInvoiceIdPrintRouteImport
+      parentRoute: typeof HisabInvoiceIdRoute
+    }
   }
 }
+
+interface HisabInvoiceIdRouteChildren {
+  HisabInvoiceIdPrintRoute: typeof HisabInvoiceIdPrintRoute
+}
+
+const HisabInvoiceIdRouteChildren: HisabInvoiceIdRouteChildren = {
+  HisabInvoiceIdPrintRoute: HisabInvoiceIdPrintRoute,
+}
+
+const HisabInvoiceIdRouteWithChildren = HisabInvoiceIdRoute._addFileChildren(
+  HisabInvoiceIdRouteChildren,
+)
 
 interface HisabRouteChildren {
   HisabActivityRoute: typeof HisabActivityRoute
@@ -741,6 +810,8 @@ interface HisabRouteChildren {
   HisabFilesRoute: typeof HisabFilesRoute
   HisabHelpRoute: typeof HisabHelpRoute
   HisabListRoute: typeof HisabListRoute
+  HisabLogsRoute: typeof HisabLogsRoute
+  HisabMakerRoute: typeof HisabMakerRoute
   HisabMoreRoute: typeof HisabMoreRoute
   HisabNewRoute: typeof HisabNewRoute
   HisabPartiesRoute: typeof HisabPartiesRoute
@@ -754,7 +825,7 @@ interface HisabRouteChildren {
   HisabWarehousesRoute: typeof HisabWarehousesRoute
   HisabIndexRoute: typeof HisabIndexRoute
   HisabCustomerIdRoute: typeof HisabCustomerIdRoute
-  HisabInvoiceIdRoute: typeof HisabInvoiceIdRoute
+  HisabInvoiceIdRoute: typeof HisabInvoiceIdRouteWithChildren
   HisabSupplierIdRoute: typeof HisabSupplierIdRoute
 }
 
@@ -766,6 +837,8 @@ const HisabRouteChildren: HisabRouteChildren = {
   HisabFilesRoute: HisabFilesRoute,
   HisabHelpRoute: HisabHelpRoute,
   HisabListRoute: HisabListRoute,
+  HisabLogsRoute: HisabLogsRoute,
+  HisabMakerRoute: HisabMakerRoute,
   HisabMoreRoute: HisabMoreRoute,
   HisabNewRoute: HisabNewRoute,
   HisabPartiesRoute: HisabPartiesRoute,
@@ -779,7 +852,7 @@ const HisabRouteChildren: HisabRouteChildren = {
   HisabWarehousesRoute: HisabWarehousesRoute,
   HisabIndexRoute: HisabIndexRoute,
   HisabCustomerIdRoute: HisabCustomerIdRoute,
-  HisabInvoiceIdRoute: HisabInvoiceIdRoute,
+  HisabInvoiceIdRoute: HisabInvoiceIdRouteWithChildren,
   HisabSupplierIdRoute: HisabSupplierIdRoute,
 }
 

@@ -7,6 +7,7 @@ import { listInvoices } from "@/lib/hisab/api";
 import { INVOICE_TYPES, typeColor, typeLabel, GOODS_STATUS } from "@/lib/hisab/constants";
 import { bnDate, money, num, toBn } from "@/lib/hisab/format";
 import { Button, Card, Chip, Empty, Field, Input, Loading } from "@/components/hisab/ui";
+import { useHisabSession } from "@/components/hisab/session";
 import type { InvoiceFilters, Invoice } from "@/lib/hisab/types";
 
 type ListSearch = { pending?: boolean; due?: boolean; party?: string };
@@ -24,6 +25,8 @@ export const Route = createFileRoute("/hisab/list")({
 
 function ListPage() {
   const initial = Route.useSearch();
+  const { role, userId } = useHisabSession();
+  const seller = role === "seller";
   const [open, setOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<InvoiceFilters>({
     text: initial.party ?? "",
@@ -39,9 +42,15 @@ function ListPage() {
     return () => clearTimeout(id);
   }, [text]);
 
+  // বিক্রেতার তালিকায় শুধু নিজের লেখা এন্ট্রি — এই ছাঁকনিটা মুছে ফেলা যায় না
+  const effective = React.useMemo<InvoiceFilters>(
+    () => (seller && userId ? { ...filters, createdBy: userId } : filters),
+    [filters, seller, userId],
+  );
+
   const query = useQuery({
-    queryKey: ["hisab", "invoices", filters],
-    queryFn: () => listInvoices(filters, 300),
+    queryKey: ["hisab", "invoices", effective],
+    queryFn: () => listInvoices(effective, 300),
     staleTime: 20_000,
   });
 
@@ -196,7 +205,11 @@ function ListPage() {
         <Empty
           icon={<Filter className="h-8 w-8" />}
           title="কিছু পাওয়া যায়নি"
-          hint="ছাঁকনি বদলে দেখুন, অথবা নিচের ➕ দিয়ে নতুন হিসাব লিখুন।"
+          hint={
+            seller
+              ? "নিচের বিক্রয় পাতা থেকে নতুন চালান লিখুন — এখানে শুধু আপনার লেখাই দেখা যায়।"
+              : "ছাঁকনি বদলে দেখুন, অথবা নিচের ➕ দিয়ে নতুন হিসাব লিখুন।"
+          }
         />
       ) : (
         <div className="space-y-2">

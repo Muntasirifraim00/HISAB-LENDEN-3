@@ -11,6 +11,7 @@ import {
   PackageCheck,
   Pencil,
   Plus,
+  Printer,
   RotateCcw,
   Undo2,
   Wrench,
@@ -62,6 +63,7 @@ import {
   Select,
   Textarea,
 } from "@/components/hisab/ui";
+import { useHisabSession } from "@/components/hisab/session";
 
 export const Route = createFileRoute("/hisab/invoice/$id")({
   component: InvoiceDetail,
@@ -71,6 +73,8 @@ function InvoiceDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { role, userId } = useHisabSession();
+  const seller = role === "seller";
   const [panel, setPanel] = React.useState<
     null | "payment" | "receive" | "details" | "reverse" | "amend"
   >(null);
@@ -244,79 +248,107 @@ function InvoiceDetail() {
         ) : null}
       </Card>
 
-      {/* কাজ */}
-      <div className="grid grid-cols-2 gap-2">
-        {num(inv.due_amount) > 0 ? (
-          <Button
-            variant="success"
-            onClick={() => setPanel(panel === "payment" ? null : "payment")}
-          >
-            <Plus className="h-4 w-4" />
-            কিস্তি যোগ করুন
-          </Button>
-        ) : null}
-        {goodsPending ? (
-          <Button onClick={() => setPanel(panel === "receive" ? null : "receive")}>
-            <PackageCheck className="h-4 w-4" />
-            মাল বুঝে পেয়েছি
-          </Button>
-        ) : null}
-        <Button variant="outline" onClick={() => setPanel(panel === "details" ? null : "details")}>
-          <Pencil className="h-4 w-4" />
-          বিবরণ বদলান
-        </Button>
-        {!inv.is_reversal && !cancelled ? (
-          <Button onClick={() => setPanel(panel === "amend" ? null : "amend")}>
-            <Wrench className="h-4 w-4" />
-            ভুল সংশোধন
-          </Button>
-        ) : null}
-        {!inv.is_reversal && !cancelled ? (
-          <Button variant="danger" onClick={() => setPanel(panel === "reverse" ? null : "reverse")}>
-            <Undo2 className="h-4 w-4" />
-            বাতিল / সংশোধনী
-          </Button>
-        ) : null}
-      </div>
+      {/* প্রিন্ট — সবার জন্য */}
+      <Link
+        to="/hisab/invoice/$id/print"
+        params={{ id: inv.id }}
+        className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[14px] font-bold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+      >
+        <Printer className="h-4 w-4" />
+        ইনভয়েস প্রিন্ট করুন
+      </Link>
 
-      <ErrorNote>{error}</ErrorNote>
+      {/* কাজ — বিক্রেতা শুধু দেখতে পারেন, বদলাতে পারেন না */}
+      {seller ? (
+        inv.created_by !== userId ? (
+          <ErrorNote>এই এন্ট্রিটা আপনার লেখা নয় — শুধু দেখতে পারছেন।</ErrorNote>
+        ) : (
+          <p className="rounded-xl bg-slate-100 px-3 py-2 text-[12px] text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            আপনি লিখেছেন এই এন্ট্রি — বদলাতে বা বাতিল করতে পারবেন না, দরকার হলে মালিককে বলুন।
+          </p>
+        )
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            {num(inv.due_amount) > 0 ? (
+              <Button
+                variant="success"
+                onClick={() => setPanel(panel === "payment" ? null : "payment")}
+              >
+                <Plus className="h-4 w-4" />
+                কিস্তি যোগ করুন
+              </Button>
+            ) : null}
+            {goodsPending ? (
+              <Button onClick={() => setPanel(panel === "receive" ? null : "receive")}>
+                <PackageCheck className="h-4 w-4" />
+                মাল বুঝে পেয়েছি
+              </Button>
+            ) : null}
+            <Button
+              variant="outline"
+              onClick={() => setPanel(panel === "details" ? null : "details")}
+            >
+              <Pencil className="h-4 w-4" />
+              বিবরণ বদলান
+            </Button>
+            {!inv.is_reversal && !cancelled ? (
+              <Button onClick={() => setPanel(panel === "amend" ? null : "amend")}>
+                <Wrench className="h-4 w-4" />
+                ভুল সংশোধন
+              </Button>
+            ) : null}
+            {!inv.is_reversal && !cancelled ? (
+              <Button
+                variant="danger"
+                onClick={() => setPanel(panel === "reverse" ? null : "reverse")}
+              >
+                <Undo2 className="h-4 w-4" />
+                বাতিল / সংশোধনী
+              </Button>
+            ) : null}
+          </div>
 
-      {panel === "payment" ? (
-        <PaymentPanel
-          invoiceId={inv.id}
-          due={num(inv.due_amount)}
-          onDone={refreshAll}
-          onError={setError}
-        />
-      ) : null}
-      {panel === "receive" ? (
-        <ReceivePanel
-          invoiceId={inv.id}
-          items={items.data ?? []}
-          onDone={refreshAll}
-          onError={setError}
-        />
-      ) : null}
-      {panel === "details" ? (
-        <DetailsPanel
-          invoiceId={inv.id}
-          current={inv.details ?? ""}
-          onDone={refreshAll}
-          onError={setError}
-        />
-      ) : null}
-      {panel === "amend" ? (
-        <AmendPanel
-          invoice={inv}
-          items={items.data ?? []}
-          expenses={expenses.data ?? []}
-          onDone={refreshAll}
-          onError={setError}
-        />
-      ) : null}
-      {panel === "reverse" ? (
-        <ReversePanel invoiceId={inv.id} onDone={refreshAll} onError={setError} />
-      ) : null}
+          <ErrorNote>{error}</ErrorNote>
+
+          {panel === "payment" ? (
+            <PaymentPanel
+              invoiceId={inv.id}
+              due={num(inv.due_amount)}
+              onDone={refreshAll}
+              onError={setError}
+            />
+          ) : null}
+          {panel === "receive" ? (
+            <ReceivePanel
+              invoiceId={inv.id}
+              items={items.data ?? []}
+              onDone={refreshAll}
+              onError={setError}
+            />
+          ) : null}
+          {panel === "details" ? (
+            <DetailsPanel
+              invoiceId={inv.id}
+              current={inv.details ?? ""}
+              onDone={refreshAll}
+              onError={setError}
+            />
+          ) : null}
+          {panel === "amend" ? (
+            <AmendPanel
+              invoice={inv}
+              items={items.data ?? []}
+              expenses={expenses.data ?? []}
+              onDone={refreshAll}
+              onError={setError}
+            />
+          ) : null}
+          {panel === "reverse" ? (
+            <ReversePanel invoiceId={inv.id} onDone={refreshAll} onError={setError} />
+          ) : null}
+        </>
+      )}
 
       {/* বিবরণ */}
       {inv.details ? (

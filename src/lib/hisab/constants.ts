@@ -9,7 +9,12 @@ export const HISAB_USERS = [
   { name: "RUBEL", color: "#ea580c", ring: "ring-orange-500" },
   { name: "SHOWKOT", color: "#0891b2", ring: "ring-cyan-500" },
   { name: "TASLIM", color: "#db2777", ring: "ring-pink-500" },
+  // বিক্রেতা — শুধু বিক্রি আর ইনভয়েস মেকার চালাতে পারে
+  { name: "SELLER", color: "#f59e0b", ring: "ring-amber-500" },
 ] as const;
+
+/** ব্যবহারকারীর ভূমিকা — ডেটাবেসের hb_user_roles থেকে আসে */
+export type HisabRole = "owner" | "seller";
 
 export type HisabUserName = (typeof HISAB_USERS)[number]["name"];
 

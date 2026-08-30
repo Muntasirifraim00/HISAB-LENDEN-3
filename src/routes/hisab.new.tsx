@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ import {
 } from "@/components/hisab/ui";
 import { Autocomplete } from "@/components/hisab/autocomplete";
 import { hisabFetch } from "@/lib/hisab/apiFetch";
+import { useHisabSession } from "@/components/hisab/session";
 
 export const Route = createFileRoute("/hisab/new")({
   validateSearch: (search: Record<string, unknown>): { type?: InvoiceType } =>
@@ -406,6 +407,10 @@ function NewEntry() {
   }
 
   const typeMeta = INVOICE_TYPES.find((t) => t.value === form.type)!;
+
+  // বিক্রেতা এই ফর্ম ব্যবহার করেন না — ইনভয়েস মেকারই তার বিক্রির পাতা
+  const { role } = useHisabSession();
+  if (role === "seller") return <Navigate to="/hisab/maker" replace />;
 
   return (
     <form onSubmit={submit} className="space-y-4">

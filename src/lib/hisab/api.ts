@@ -22,7 +22,9 @@ import type {
   ProductCategory,
   StockMove,
   StockRow,
+  SubmissionLog,
 } from "./types";
+import type { HisabRole } from "./constants";
 
 // হিসাবের টেবিলগুলো generated Supabase types-এ নেই (আলাদা মাইগ্রেশন),
 // তাই এই এক জায়গায় আলগা টাইপে ক্লায়েন্ট ধরা হয়েছে।
@@ -72,6 +74,7 @@ export async function listInvoices(filters: InvoiceFilters = {}, limit = 200) {
   if (filters.maxAmount != null) q = q.lte("total_amount", filters.maxAmount);
   if (filters.dueOnly) q = q.gt("due_amount", 0);
   if (filters.pendingGoodsOnly) q = q.in("goods_status", ["pending", "partial"]);
+  if (filters.createdBy) q = q.eq("created_by", filters.createdBy);
   if (filters.text?.trim()) {
     const t = filters.text.trim().replace(/[%,]/g, " ");
     q = q.or(
@@ -319,6 +322,37 @@ export async function uploadInvoiceImage(file: File) {
   if (error) throw new Error(translateError(error.message));
 
   return getDb().storage.from("hisab").getPublicUrl(path).data.publicUrl;
+}
+
+/* ------------------------------ ভূমিকা ও লগ ------------------------------ */
+
+/** এখনকার ব্যবহারকারীর ভূমিকা — owner না হলে বিক্রেতা */
+export async function myRole(): Promise<HisabRole> {
+  const role = unwrap<string>(await db.rpc("hb_my_role"));
+  return role === "seller" ? "seller" : "owner";
+}
+
+/** ইনভয়েস মেকারের পরের অটো মেমো নম্বর (সিকোয়েন্স খরচ হয় না) */
+export async function nextMemoNo(): Promise<string> {
+  return unwrap<string>(await db.rpc("hb_next_memo_no"));
+}
+
+/** লগইন/লগআউট জমার খাতায় টোকা হয় */
+export async function logEvent(action: "auth.login" | "auth.logout") {
+  await db.rpc("hb_log_event", { p_action: action });
+}
+
+/** জমা দেওয়ার খাতা — বিক্রেতার কাছে শুধু নিজেরটা পৌঁছায় (RLS) */
+export async function listSubmissionLogs(limit = 300) {
+  return (
+    unwrap<SubmissionLog[]>(
+      await db
+        .from("hb_submission_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+    ) ?? []
+  );
 }
 
 /** ফাইল পাতা — সব ইনভয়েসের ছবি */

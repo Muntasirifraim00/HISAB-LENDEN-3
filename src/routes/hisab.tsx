@@ -1,6 +1,15 @@
-import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@tanstack/react-router";
 import * as React from "react";
-import { Boxes, LayoutDashboard, ListChecks, MoreHorizontal, Plus } from "lucide-react";
+import {
+  Boxes,
+  ClipboardList,
+  LayoutDashboard,
+  ListChecks,
+  MoreHorizontal,
+  Plus,
+  ReceiptText,
+  ShieldAlert,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { HisabSessionProvider, useHisabSession } from "@/components/hisab/session";
@@ -34,6 +43,22 @@ const NAV = [
   { to: "/hisab/more", label: "আরও", icon: MoreHorizontal, exact: false },
 ];
 
+/** বিক্রেতার পর্দা — শুধু বিক্রি, নিজের তালিকা আর জমার খাতা */
+const NAV_SELLER = [
+  { to: "/hisab/maker", label: "বিক্রয়", icon: ReceiptText, exact: false },
+  { to: "/hisab/list", label: "আমার তালিকা", icon: ListChecks, exact: false },
+  { to: "/hisab/logs", label: "লগ", icon: ClipboardList, exact: false },
+];
+
+/** বিক্রেতা ঢুকতে পারেন এমন পথগুলো — বাকি সব ডেটাবেসও আটকায় */
+const SELLER_ALLOWED = [
+  "/hisab/maker",
+  "/hisab/new",
+  "/hisab/list",
+  "/hisab/invoice/",
+  "/hisab/logs",
+];
+
 function HisabLayout() {
   return (
     <HisabSessionProvider>
@@ -44,7 +69,7 @@ function HisabLayout() {
 }
 
 function Shell() {
-  const { status, userName } = useHisabSession();
+  const { status, userName, role } = useHisabSession();
   const location = useLocation();
 
   if (status === "checking") {
@@ -59,13 +84,65 @@ function Shell() {
     return <NamePicker />;
   }
 
+  // ভূমিকা ততক্ষণ যাচাই হয়, পর্দা ভুল হাতে না পড়ে
+  if (role === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <Spinner className="h-7 w-7" />
+      </div>
+    );
+  }
+
+  const seller = role === "seller";
+
+  if (seller) {
+    // ড্যাশবোর্ডে ঢুকলেই বিক্রির পর্দায় চলে যায়
+    if (location.pathname === "/hisab") {
+      return <Navigate to="/hisab/maker" replace />;
+    }
+
+    const allowed = SELLER_ALLOWED.some((p) => location.pathname.startsWith(p));
+    if (!allowed) {
+      return <NoPermission userName={userName} />;
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 pb-24 dark:bg-slate-950">
-      <TopBar userName={userName} />
+      <TopBar userName={userName} seller={seller} />
       <main className="mx-auto w-full max-w-3xl px-3 py-4">
         <Outlet />
       </main>
-      <BottomNav pathname={location.pathname} />
+      <BottomNav pathname={location.pathname} seller={seller} />
+    </div>
+  );
+}
+
+/** বিক্রেতার জন্য বন্ধ পাতা */
+function NoPermission({ userName }: { userName: string }) {
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <TopBar userName={userName} seller />
+      <div className="mx-auto w-full max-w-3xl px-3 py-16">
+        <div className="rounded-2xl bg-white p-6 text-center shadow-sm dark:bg-slate-900">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950/40">
+            <ShieldAlert className="h-7 w-7" />
+          </span>
+          <h1 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">
+            এই পাতাটা আপনার জন্য খোলা নয়
+          </h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-slate-500">
+            বিক্রেতা হিসেবে আপনি বিক্রি, নিজের তালিকা আর জমার খাতা দেখতে পারেন।
+          </p>
+          <Link
+            to="/hisab/maker"
+            className="mt-5 inline-block rounded-xl bg-[#132a6b] px-5 py-2.5 text-[13px] font-bold text-white"
+          >
+            বিক্রিতে ফিরে যান
+          </Link>
+        </div>
+      </div>
+      <BottomNav pathname="" seller />
     </div>
   );
 }
@@ -184,30 +261,34 @@ function NamePicker() {
   );
 }
 
-function TopBar({ userName }: { userName: string }) {
+function TopBar({ userName, seller = false }: { userName: string; seller?: boolean }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { signOut } = useHisabSession();
 
   return (
     <header className="sticky top-0 z-30 bg-[#132a6b] text-white shadow-md">
       <div className="mx-auto flex w-full max-w-3xl items-center gap-3 px-3 py-3">
-        <Link to="/hisab" className="flex items-center gap-2">
+        <Link to={seller ? "/hisab/maker" : "/hisab"} className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-white text-[15px] font-black leading-none">
             হি
           </span>
           <span className="text-[15px] font-bold leading-tight">
             হিসাব
-            <span className="block text-[10px] font-medium opacity-75">খাতা ও গুদাম</span>
+            <span className="block text-[10px] font-medium opacity-75">
+              {seller ? "বিক্রয় কেন্দ্র" : "খাতা ও গুদাম"}
+            </span>
           </span>
         </Link>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link
-            to="/hisab/list"
-            className="rounded-lg px-2 py-1.5 text-[12px] font-semibold hover:bg-white/10"
-          >
-            খুঁজুন
-          </Link>
+          {seller ? null : (
+            <Link
+              to="/hisab/list"
+              className="rounded-lg px-2 py-1.5 text-[12px] font-semibold hover:bg-white/10"
+            >
+              খুঁজুন
+            </Link>
+          )}
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="flex items-center gap-1.5 rounded-full bg-white/10 py-1 pl-1 pr-2.5 hover:bg-white/20"
@@ -215,6 +296,11 @@ function TopBar({ userName }: { userName: string }) {
           >
             <Avatar name={userName} size={26} />
             <span className="text-[12px] font-bold">{userName}</span>
+            {seller ? (
+              <span className="rounded-full bg-amber-400/90 px-1.5 py-0.5 text-[9px] font-black text-amber-950">
+                বিক্রেতা
+              </span>
+            ) : null}
           </button>
         </div>
       </div>
@@ -222,21 +308,31 @@ function TopBar({ userName }: { userName: string }) {
       {menuOpen ? (
         <div className="border-t border-white/10 bg-[#0f2258]">
           <div className="mx-auto flex w-full max-w-3xl flex-wrap gap-2 px-3 py-2.5 text-[12px]">
-            <Link to="/hisab/products" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
-              পণ্য ও ক্যাটাগরি
-            </Link>
-            <Link to="/hisab/parties" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
-              পার্টি
-            </Link>
-            <Link to="/hisab/reports" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
-              রিপোর্ট
-            </Link>
-            <Link to="/hisab/help" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
-              সাহায্য
-            </Link>
+            {seller ? null : (
+              <>
+                <Link
+                  to="/hisab/products"
+                  className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold"
+                >
+                  পণ্য ও ক্যাটাগরি
+                </Link>
+                <Link to="/hisab/parties" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
+                  পার্টি
+                </Link>
+                <Link
+                  to="/hisab/reports"
+                  className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold"
+                >
+                  রিপোর্ট
+                </Link>
+                <Link to="/hisab/help" className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold">
+                  সাহায্য
+                </Link>
+              </>
+            )}
             <button
               onClick={() => void signOut()}
-              className="ml-auto rounded-lg bg-white/10 px-3 py-1.5 font-semibold"
+              className={cn("rounded-lg bg-white/10 px-3 py-1.5 font-semibold", !seller && "ml-auto")}
             >
               বেরিয়ে যান
             </button>
@@ -247,7 +343,19 @@ function TopBar({ userName }: { userName: string }) {
   );
 }
 
-function BottomNav({ pathname }: { pathname: string }) {
+function BottomNav({ pathname, seller = false }: { pathname: string; seller?: boolean }) {
+  if (seller) {
+    return (
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-3 items-end px-2 pb-[max(0.4rem,env(safe-area-inset-bottom))] pt-1.5">
+          {NAV_SELLER.map((n) => (
+            <NavButton key={n.to} item={n} pathname={pathname} />
+          ))}
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
       <div className="mx-auto grid w-full max-w-3xl grid-cols-5 items-end px-2 pb-[max(0.4rem,env(safe-area-inset-bottom))] pt-1.5">
