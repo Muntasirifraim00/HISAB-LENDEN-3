@@ -40,11 +40,25 @@ ALTER TABLE public.invoice_expenses
 UPDATE public.invoice_items SET landed_total = line_total WHERE landed_total IS NULL;
 
 -- ---------------------------------------------------------------------
--- ২. পুঁজির ট্রিগার — অতিরিক্ত খরচও ধরবে
+-- ২. পুঁজির ট্রিগার — অতিরিক্ত খরচ ও সংশোধনী দুটোই ঠিকভাবে ধরবে
 -- ---------------------------------------------------------------------
--- আগে শুধু paid_amount বদলালে কাজ করত। এখন extra_cost বদলালেও কাজ করে।
--- hb_create_invoice প্রথমে চালান বসায় (extra_cost = ০), তারপর শেষে
--- extra_cost বসায় — সেই UPDATE-টাই এখানে ধরা পড়ে।
+-- তিনটে জিনিস এখানে সামলানো হয়:
+--
+--   ১. অতিরিক্ত খরচ। আগে ট্রিগার শুধু paid_amount বদলালে চলত।
+--      hb_create_invoice প্রথমে চালান বসায় (extra_cost = ০), শেষে
+--      extra_cost বসায় — সেই UPDATE-টাই এখন ধরা পড়ে।
+--
+--   ২. hb.sys — গার্ড পাশ কাটানোর চাবি। ট্রিগার চলে অন্য ফাংশনের
+--      কাজের *মাঝখানে*, তাই নিজে থেকে 'off' করলে ডাকা ফাংশনের বাকি
+--      লাইনগুলো গার্ডে আটকে যায় (hb_reverse_invoice-এর শেষ UPDATE-এ
+--      ঠিক সেটাই হচ্ছিল)। তাই আগের অবস্থাটা মনে রেখে ফিরিয়ে দেওয়া হয়।
+--
+--   ৩. সংশোধনী। সংশোধনী এন্ট্রিতে cogs ও profit ঋণাত্মক বসে, কিন্তু
+--      paid_amount বসে ধনাত্মকই — টেবিলে CHECK (paid_amount >= 0) আছে
+--      বলে ঋণাত্মক বসানোই যায় না। ফলে ট্রিগার সংশোধনীকে আরেকটা সাধারণ
+--      চালান ভেবে টাকা আবার কেটে নিত: ১০,০০০ টাকার ক্রয় বাতিল করলে
+--      পুঁজিতে ১০,০০০ ফেরত আসার বদলে আরও ১০,০০০ কমে যেত। এখন
+--      is_reversal দেখে পরিশোধের দিকটা উল্টে দেওয়া হয়।
 CREATE OR REPLACE FUNCTION public.hb_capital_update_trigger()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -52,9 +66,11 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_paid   NUMERIC;
-  v_extra  NUMERIC;
-  v_change NUMERIC;
+  v_paid    NUMERIC;
+  v_extra   NUMERIC;
+  v_by_paid NUMERIC;
+  v_change  NUMERIC;
+  v_prev    TEXT;
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM public.business_capital) THEN
     RETURN CASE TG_OP WHEN 'DELETE' THEN OLD ELSE NEW END;
@@ -70,21 +86,31 @@ BEGIN
 
   -- বিক্রয়ে টাকা আসে, ক্রয় ও খরচে বেরিয়ে যায়
   IF NEW.type = 'sale' THEN
-    v_change := v_paid;
+    v_by_paid := v_paid;
   ELSE
-    v_change := -v_paid;
+    v_by_paid := -v_paid;
   END IF;
 
-  -- অতিরিক্ত খরচ সব ক্ষেত্রেই বেরিয়ে যাওয়া টাকা
-  v_change := v_change - v_extra;
+  -- সংশোধনী মানে মূল এন্ট্রির উল্টো — টাকাও উল্টো দিকে যায়
+  IF NEW.is_reversal THEN
+    v_by_paid := -v_by_paid;
+  END IF;
+
+  -- অতিরিক্ত খরচ বেরিয়ে যাওয়া টাকা; সংশোধনীতে এটা ঋণাত্মক বসে বলে
+  -- বিয়োগ করলেই আপনাআপনি ফেরত আসে
+  v_change := v_by_paid - v_extra;
 
   IF v_change <> 0 THEN
+    v_prev := coalesce(current_setting('hb.sys', true), '');
     PERFORM set_config('hb.sys', 'on', true);
+
     UPDATE public.business_capital
        SET current_balance = current_balance + v_change,
            updated_at = now()
      WHERE 1=1;
-    PERFORM set_config('hb.sys', 'off', true);
+
+    -- ডাকা ফাংশন যেভাবে রেখেছিল, সেভাবেই ফিরিয়ে দিই
+    PERFORM set_config('hb.sys', v_prev, true);
   END IF;
 
   RETURN CASE TG_OP WHEN 'DELETE' THEN OLD ELSE NEW END;
