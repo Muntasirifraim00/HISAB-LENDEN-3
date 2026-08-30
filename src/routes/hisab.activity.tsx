@@ -66,6 +66,7 @@ function ActivityPage() {
                     <p className="mt-0.5 flex items-center gap-1.5 text-[10px] text-slate-500">
                       {bnDateTime(r.created_at)}
                       {r.is_reversal ? <Chip color="#dc2626">সংশোধনী</Chip> : null}
+                      {r.amends_invoice_id ? <Chip color="#d97706">সংশোধিত</Chip> : null}
                       {r.reversed_at ? <Chip color="#dc2626">বাতিল হয়েছে</Chip> : null}
                     </p>
                   </div>

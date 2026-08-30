@@ -12,6 +12,7 @@ import {
   Users,
   UserCheck,
   Truck,
+  Wrench,
 } from "lucide-react";
 import { useHisabSession } from "@/components/hisab/session";
 import { Avatar, Card, SectionTitle } from "@/components/hisab/ui";
@@ -60,6 +61,12 @@ const LINKS = [
     icon: FileBarChart,
   },
   { to: "/hisab/activity", label: "কার্যক্রম", hint: "দিন ধরে ধরে কে কী করল", icon: Activity },
+  {
+    to: "/hisab/corrections",
+    label: "সংশোধনের খাতা",
+    hint: "কে কোন ভুল ঠিক করল, আগে কী ছিল, পরে কী হলো",
+    icon: Wrench,
+  },
   { to: "/hisab/files", label: "ফাইল", hint: "সব মেমোর ছবি এক জায়গায়", icon: FolderOpen },
   { to: "/hisab/help", label: "সাহায্য", hint: "নিয়মকানুন বাংলায়", icon: HelpCircle },
 ];

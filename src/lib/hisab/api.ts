@@ -6,8 +6,11 @@
  */
 import { getDb } from "./db";
 import type {
+  AmendInvoiceInput,
+  Correction,
   DetailEdit,
   Invoice,
+  InvoiceAudit,
   InvoiceExpense,
   InvoiceFilters,
   InvoiceItem,
@@ -177,6 +180,74 @@ export async function reverseInvoice(payload: {
   reason: string;
 }) {
   return unwrap<Invoice>(await db.rpc("hb_reverse_invoice", { p: payload }));
+}
+
+/**
+ * ভুল এন্ট্রি সংশোধন।
+ *
+ * ডেটাবেসে তিন ধাপে হয় — মূলটা বাতিল, সংশোধিত অঙ্কে নতুন এন্ট্রি, তারপর
+ * দুটো জোড়া লাগে। তারিখ ও ধরন পাঠানো যায় না, ওগুলো বদলায় না।
+ */
+export async function amendInvoice(payload: AmendInvoiceInput) {
+  return unwrap<Invoice>(await db.rpc("hb_amend_invoice", { p: payload }));
+}
+
+/* --------------------------- সংশোধনের খাতা --------------------------- */
+
+/** এই এন্ট্রিতে যা যা হাত পড়েছে */
+export async function getInvoiceAudit(invoiceId: string) {
+  return (
+    unwrap<InvoiceAudit[]>(
+      await db
+        .from("invoice_audit")
+        .select("*")
+        .or(`invoice_id.eq.${invoiceId},new_invoice_id.eq.${invoiceId}`)
+        .order("created_at", { ascending: false }),
+    ) ?? []
+  );
+}
+
+/**
+ * সব সংশোধন — একেকটা সংশোধনের সারিগুলো একসাথে গুছিয়ে।
+ *
+ * ডেটাবেসে একটা সংশোধন কয়েকটা সারি হয়ে থাকে (একটা শিরোনাম, তারপর যে
+ * ঘরগুলো বদলেছে তার একটা করে)। পাতায় দেখানোর সময় সেগুলো এক দলা করা হয়।
+ */
+export async function listCorrections(limit = 300) {
+  const rows =
+    unwrap<InvoiceAudit[]>(
+      await db
+        .from("invoice_audit")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+    ) ?? [];
+
+  const byKey = new Map<string, Correction>();
+  for (const r of rows) {
+    // একই সংশোধনের সব সারির সময় ও সূত্র এক — সেটাই দলা বাঁধার চাবি
+    const key = `${r.invoice_id}|${r.created_at}|${r.action}`;
+    let c = byKey.get(key);
+    if (!c) {
+      c = {
+        key,
+        invoice_id: r.invoice_id,
+        new_invoice_id: r.new_invoice_id,
+        action: r.action,
+        reason: r.reason,
+        actor_name: r.actor_name,
+        created_at: r.created_at,
+        changes: [],
+      };
+      byKey.set(key, c);
+    }
+    if (r.new_invoice_id && !c.new_invoice_id) c.new_invoice_id = r.new_invoice_id;
+    if (r.reason && !c.reason) c.reason = r.reason;
+    if (r.field) {
+      c.changes.push({ field: r.field, old_value: r.old_value, new_value: r.new_value });
+    }
+  }
+  return [...byKey.values()];
 }
 
 /* ------------------------------ পণ্য ------------------------------ */

@@ -25,6 +25,8 @@ export type Invoice = {
   is_reversal: boolean;
   reverses_invoice_id: string | null;
   reversed_at: string | null;
+  /** এই এন্ট্রিটা কোন ভুল এন্ট্রির বদলে এসেছে */
+  amends_invoice_id: string | null;
   detail_revision: number;
   created_by: string | null;
   created_by_name: string;
@@ -87,6 +89,48 @@ export type DetailEdit = {
   new_details: string | null;
   edited_by_name: string;
   created_at: string;
+};
+
+/** নজরদারির খাতার একটা সারি — কে, কখন, কোন ঘর, আগে কী, পরে কী */
+export type InvoiceAudit = {
+  id: string;
+  invoice_id: string;
+  new_invoice_id: string | null;
+  action: "edit" | "amend";
+  /** null মানে এটা সংশোধনের শিরোনামের সারি */
+  field: string | null;
+  old_value: string | null;
+  new_value: string | null;
+  reason: string | null;
+  actor: string | null;
+  actor_name: string;
+  created_at: string;
+};
+
+/** সংশোধনের খাতায় একটা সংশোধন — শিরোনাম + যে ঘরগুলো বদলাল */
+export type Correction = {
+  key: string;
+  invoice_id: string;
+  new_invoice_id: string | null;
+  action: "edit" | "amend";
+  reason: string | null;
+  actor_name: string;
+  created_at: string;
+  changes: { field: string; old_value: string | null; new_value: string | null }[];
+};
+
+/** সংশোধনের ফর্ম থেকে যা যায় — তারিখ ও ধরন এখানে নেই, ওগুলো বদলায় না */
+export type AmendInvoiceInput = {
+  invoice_id: string;
+  reason: string;
+  total_amount?: number;
+  paid_amount?: number;
+  party_name?: string | null;
+  memo_no?: string | null;
+  details?: string | null;
+  payment_method?: PaymentMethod;
+  items?: NewInvoiceInput["items"];
+  expenses?: NewInvoiceInput["expenses"];
 };
 
 export type ProductCategory = {

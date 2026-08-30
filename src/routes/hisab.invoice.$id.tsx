@@ -13,13 +13,14 @@ import {
   Plus,
   RotateCcw,
   Undo2,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   addPayment,
   editDetails,
-  getDetailEdits,
   getInvoice,
+  getInvoiceAudit,
   getInvoiceExpenses,
   getInvoiceItems,
   getInvoicePayments,
@@ -28,6 +29,7 @@ import {
   receiveGoods,
   reverseInvoice,
 } from "@/lib/hisab/api";
+import { AmendPanel } from "@/components/hisab/amend-panel";
 import {
   GOODS_STATUS,
   methodLabel,
@@ -69,9 +71,9 @@ function InvoiceDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [panel, setPanel] = React.useState<null | "payment" | "receive" | "details" | "reverse">(
-    null,
-  );
+  const [panel, setPanel] = React.useState<
+    null | "payment" | "receive" | "details" | "reverse" | "amend"
+  >(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const invoice = useQuery({ queryKey: ["hisab", "invoice", id], queryFn: () => getInvoice(id) });
@@ -91,13 +93,13 @@ function InvoiceDetail() {
     queryKey: ["hisab", "invoice", id, "expenses"],
     queryFn: () => getInvoiceExpenses(id),
   });
-  const edits = useQuery({
-    queryKey: ["hisab", "invoice", id, "edits"],
-    queryFn: () => getDetailEdits(id),
-  });
   const reversal = useQuery({
     queryKey: ["hisab", "invoice", id, "reversal"],
     queryFn: () => getReversalOf(id),
+  });
+  const audit = useQuery({
+    queryKey: ["hisab", "invoice", id, "audit"],
+    queryFn: () => getInvoiceAudit(id),
   });
 
   const refreshAll = () => {
@@ -117,6 +119,11 @@ function InvoiceDetail() {
   const cancelled = !!inv.reversed_at;
   const goodsPending = inv.goods_status === "pending" || inv.goods_status === "partial";
 
+  // এই এন্ট্রিটা সংশোধন করা হয়ে থাকলে সংশোধিত এন্ট্রিটা কোনটা
+  const correctedInto =
+    (audit.data ?? []).find((a) => a.invoice_id === inv.id && a.new_invoice_id)?.new_invoice_id ??
+    null;
+
   return (
     <div className="space-y-4">
       <button
@@ -132,6 +139,7 @@ function InvoiceDetail() {
         <div className="flex flex-wrap items-center gap-1.5">
           <Chip color={color}>{typeLabel(inv.type)}</Chip>
           {inv.is_reversal ? <Chip color="#dc2626">সংশোধনী এন্ট্রি</Chip> : null}
+          {inv.amends_invoice_id ? <Chip color="#d97706">সংশোধিত এন্ট্রি</Chip> : null}
           {cancelled ? <Chip color="#dc2626">বাতিল হয়েছে</Chip> : null}
           {inv.goods_status !== "n_a" ? (
             <Chip color={GOODS_STATUS[inv.goods_status].color}>
@@ -214,6 +222,26 @@ function InvoiceDetail() {
             → এই এন্ট্রির সংশোধনীটা দেখুন
           </Link>
         ) : null}
+
+        {inv.amends_invoice_id ? (
+          <Link
+            to="/hisab/invoice/$id"
+            params={{ id: inv.amends_invoice_id }}
+            className="mt-2 block text-[12px] font-semibold text-amber-700 dark:text-amber-400"
+          >
+            → যে ভুল এন্ট্রির বদলে এটা এসেছে সেটা দেখুন
+          </Link>
+        ) : null}
+
+        {correctedInto ? (
+          <Link
+            to="/hisab/invoice/$id"
+            params={{ id: correctedInto }}
+            className="mt-2 block text-[12px] font-semibold text-amber-700 dark:text-amber-400"
+          >
+            → এই এন্ট্রিটা সংশোধন করা হয়েছে, সংশোধিত এন্ট্রিটা দেখুন
+          </Link>
+        ) : null}
       </Card>
 
       {/* কাজ */}
@@ -237,6 +265,12 @@ function InvoiceDetail() {
           <Pencil className="h-4 w-4" />
           বিবরণ বদলান
         </Button>
+        {!inv.is_reversal && !cancelled ? (
+          <Button onClick={() => setPanel(panel === "amend" ? null : "amend")}>
+            <Wrench className="h-4 w-4" />
+            ভুল সংশোধন
+          </Button>
+        ) : null}
         {!inv.is_reversal && !cancelled ? (
           <Button variant="danger" onClick={() => setPanel(panel === "reverse" ? null : "reverse")}>
             <Undo2 className="h-4 w-4" />
@@ -267,6 +301,15 @@ function InvoiceDetail() {
         <DetailsPanel
           invoiceId={inv.id}
           current={inv.details ?? ""}
+          onDone={refreshAll}
+          onError={setError}
+        />
+      ) : null}
+      {panel === "amend" ? (
+        <AmendPanel
+          invoice={inv}
+          items={items.data ?? []}
+          expenses={expenses.data ?? []}
           onDone={refreshAll}
           onError={setError}
         />
@@ -453,32 +496,43 @@ function InvoiceDetail() {
         </Card>
       ) : null}
 
-      {/* সম্পাদনার লগ */}
-      {(edits.data ?? []).length ? (
+      {/* সংশোধনের লগ — কে, কখন, কোন ঘর, আগে কী, পরে কী */}
+      {(audit.data ?? []).length ? (
         <Card>
           <SectionTitle
             title={
               <span className="flex items-center gap-1.5">
                 <History className="h-4 w-4" />
-                সম্পাদনার লগ
+                সংশোধনের লগ
               </span>
+            }
+            right={
+              <Chip>
+                <Lock className="h-3 w-3" /> অপরিবর্তনীয়
+              </Chip>
             }
           />
           <div className="space-y-2.5">
-            {(edits.data ?? []).map((e) => (
+            {(audit.data ?? []).map((a) => (
               <div
-                key={e.id}
+                key={a.id}
                 className="rounded-xl bg-slate-50 p-3 text-[12px] dark:bg-slate-800/60"
               >
                 <p className="font-bold text-slate-700 dark:text-slate-300">
-                  {toBn(e.revision_no)} নং সংশোধন · {e.edited_by_name} · {bnDateTime(e.created_at)}
+                  {a.field ?? (a.action === "amend" ? "সংশোধন করা হয়েছে" : "সম্পাদনা")} ·{" "}
+                  {a.actor_name} · {bnDateTime(a.created_at)}
                 </p>
-                <p className="mt-1.5 text-rose-700 line-through dark:text-rose-400">
-                  {e.old_details || "(খালি ছিল)"}
-                </p>
-                <p className="mt-0.5 text-emerald-700 dark:text-emerald-400">
-                  {e.new_details || "(খালি করা হয়েছে)"}
-                </p>
+                {a.field ? (
+                  <>
+                    <p className="mt-1.5 text-rose-700 line-through dark:text-rose-400">
+                      {a.old_value || "(খালি ছিল)"}
+                    </p>
+                    <p className="mt-0.5 text-emerald-700 dark:text-emerald-400">
+                      {a.new_value || "(খালি করা হয়েছে)"}
+                    </p>
+                  </>
+                ) : null}
+                {a.reason ? <p className="mt-1 text-slate-500">কারণ: {a.reason}</p> : null}
               </div>
             ))}
           </div>

@@ -229,6 +229,7 @@ function InvoiceRow({ invoice: inv }: { invoice: Invoice }) {
         <div className="flex flex-wrap items-center gap-1.5">
           <Chip color={color}>{typeLabel(inv.type)}</Chip>
           {inv.is_reversal ? <Chip color="#dc2626">সংশোধনী</Chip> : null}
+          {inv.amends_invoice_id ? <Chip color="#d97706">সংশোধিত</Chip> : null}
           {cancelled ? <Chip color="#dc2626">বাতিল হয়েছে</Chip> : null}
           {inv.goods_status === "pending" || inv.goods_status === "partial" ? (
             <Chip color={GOODS_STATUS[inv.goods_status].color}>

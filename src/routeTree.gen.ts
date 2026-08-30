@@ -14,6 +14,7 @@ import { Route as HisabRouteImport } from './routes/hisab'
 import { Route as HisabIndexRouteImport } from './routes/hisab.index'
 import { Route as HisabActivityRouteImport } from './routes/hisab.activity'
 import { Route as HisabCapitalRouteImport } from './routes/hisab.capital'
+import { Route as HisabCorrectionsRouteImport } from './routes/hisab.corrections'
 import { Route as HisabCustomersRouteImport } from './routes/hisab.customers'
 import { Route as HisabFilesRouteImport } from './routes/hisab.files'
 import { Route as HisabHelpRouteImport } from './routes/hisab.help'
@@ -68,6 +69,11 @@ const HisabActivityRoute = HisabActivityRouteImport.update({
 const HisabCapitalRoute = HisabCapitalRouteImport.update({
   id: '/capital',
   path: '/capital',
+  getParentRoute: () => HisabRoute,
+} as any)
+const HisabCorrectionsRoute = HisabCorrectionsRouteImport.update({
+  id: '/corrections',
+  path: '/corrections',
   getParentRoute: () => HisabRoute,
 } as any)
 const HisabCustomersRoute = HisabCustomersRouteImport.update({
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/hisab': typeof HisabRouteWithChildren
   '/hisab/activity': typeof HisabActivityRoute
   '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/corrections': typeof HisabCorrectionsRoute
   '/hisab/customers': typeof HisabCustomersRoute
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/hisab/activity': typeof HisabActivityRoute
   '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/corrections': typeof HisabCorrectionsRoute
   '/hisab/customers': typeof HisabCustomersRoute
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/hisab': typeof HisabRouteWithChildren
   '/hisab/activity': typeof HisabActivityRoute
   '/hisab/capital': typeof HisabCapitalRoute
+  '/hisab/corrections': typeof HisabCorrectionsRoute
   '/hisab/customers': typeof HisabCustomersRoute
   '/hisab/files': typeof HisabFilesRoute
   '/hisab/help': typeof HisabHelpRoute
@@ -341,6 +350,7 @@ export interface FileRouteTypes {
     | '/hisab'
     | '/hisab/activity'
     | '/hisab/capital'
+    | '/hisab/corrections'
     | '/hisab/customers'
     | '/hisab/files'
     | '/hisab/help'
@@ -377,6 +387,7 @@ export interface FileRouteTypes {
     | '/'
     | '/hisab/activity'
     | '/hisab/capital'
+    | '/hisab/corrections'
     | '/hisab/customers'
     | '/hisab/files'
     | '/hisab/help'
@@ -414,6 +425,7 @@ export interface FileRouteTypes {
     | '/hisab'
     | '/hisab/activity'
     | '/hisab/capital'
+    | '/hisab/corrections'
     | '/hisab/customers'
     | '/hisab/files'
     | '/hisab/help'
@@ -499,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/capital'
       fullPath: '/hisab/capital'
       preLoaderRoute: typeof HisabCapitalRouteImport
+      parentRoute: typeof HisabRoute
+    }
+    '/hisab/corrections': {
+      id: '/hisab/corrections'
+      path: '/corrections'
+      fullPath: '/hisab/corrections'
+      preLoaderRoute: typeof HisabCorrectionsRouteImport
       parentRoute: typeof HisabRoute
     }
     '/hisab/customers': {
@@ -717,6 +736,7 @@ declare module '@tanstack/react-router' {
 interface HisabRouteChildren {
   HisabActivityRoute: typeof HisabActivityRoute
   HisabCapitalRoute: typeof HisabCapitalRoute
+  HisabCorrectionsRoute: typeof HisabCorrectionsRoute
   HisabCustomersRoute: typeof HisabCustomersRoute
   HisabFilesRoute: typeof HisabFilesRoute
   HisabHelpRoute: typeof HisabHelpRoute
@@ -741,6 +761,7 @@ interface HisabRouteChildren {
 const HisabRouteChildren: HisabRouteChildren = {
   HisabActivityRoute: HisabActivityRoute,
   HisabCapitalRoute: HisabCapitalRoute,
+  HisabCorrectionsRoute: HisabCorrectionsRoute,
   HisabCustomersRoute: HisabCustomersRoute,
   HisabFilesRoute: HisabFilesRoute,
   HisabHelpRoute: HisabHelpRoute,
